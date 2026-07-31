@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="preload" as="image" href="https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1">
-    <title>Cxlvin 12-in-1 Xray Multi-Protocol Server</title>
+    <title>𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲 𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</title>
     <style>
         :root {
             --white: #ffffff;
@@ -71,7 +71,7 @@
             visibility: visible;
         }
 
-        /* PAGE 1: FULL FIT NO SCROLL */
+        
         #page1 {
             background-image: url('https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1');
             background-size: 100% 100%;
@@ -84,7 +84,7 @@
             font-size: clamp(1.1rem, 4vh, 2rem);
             text-align: center;
             text-shadow: 0 0 12px var(--glow);
-            animation: blink 2.5s infinite ease-in-out;
+            animation: blink 7.5s infinite ease-in-out;
             padding: 1rem;
         }
         @keyframes blink {
@@ -92,7 +92,7 @@
             50% { opacity: 1; }
         }
 
-        /* PAGE 2: ONLY VIDEO FULL VIEW PORTRAIT */
+    
         #page2 { background: #000; }
         #page2 video {
           width: 100vw;
@@ -103,7 +103,7 @@
         }
         #page2 audio { display: none; }
 
-        /* PAGE 3: ALL LAYOUT FULLY VISIBLE NO SCROLL */
+        
         #page3 {
             background-image: url('https://dl.dropboxusercontent.com/scl/fi/euucybdlohtjdijywmy3z/bg.jpg?rlkey=9genj9v3n4t4wvqzmr9xb4qro&st=7k24vd38&dl=1');
             background-size: 100% 100%;
@@ -144,7 +144,7 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            animation: slowBeat 2.2s infinite ease-in-out;
+            animation: slowBeat 7.2s infinite ease-in-out;
         }
         .status-indicator.good { background: var(--status-green); box-shadow: 0 0 6px var(--status-green);}
         .status-indicator.medium { background: var(--status-yellow); box-shadow: 0 0 6px var(--status-yellow);}
@@ -243,7 +243,7 @@
             overflow: hidden;
         }
         .page-title {
-            font-size: clamp(1rem, 3vh, 1.7rem);
+            font-size: clamp(0.8rem, 2.2vh, 1.3rem);
             text-align: center;
             margin: 0.4vh 0;
             text-shadow: 0 0 12px var(--glow);
@@ -432,7 +432,7 @@
         </div>
 
         <div class="glass-panel">
-            <h1 class="page-title">Cxlvin 12-in-1 Xray Multi-Protocol Server</h1>
+            <h1 class="page-title">𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲  𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</h1>
 
             <div class="protocol-row-top">
                 <div class="protocol-card" data-transport="websocket">WEBSOCKET</div>
@@ -446,7 +446,7 @@
                 <div class="protocol-card" data-protocol="vmess">Vmess</div>
             </div>
 
-            <!-- MOVED: Address & SNI Selection HERE -->
+            
             <div class="dropdown-group">
                 <div class="dropdown-container">
                     <label>Address Selection</label>
@@ -510,9 +510,9 @@
         let pageLoadTime = Date.now();
         let selectedTransport = 'websocket';
         let selectedProtocol = 'vless';
-        let cloudRunHost = null; // Only used for host= parameter in config
+        let cloudRunHost = null; 
 
-        // === CONFIG TEMPLATES WITH HOST PARAMETER ===
+        
         const configTemplates = {
             websocket: {
                 vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
@@ -534,7 +534,7 @@
             }
         };
 
-        // Base VMESS objects
+        
         const vmessBase = {
             ws: {
                 add: 'app-analytics-services.com',
@@ -545,10 +545,10 @@
                 net: 'ws',
                 type: 'none',
                 host: '',
-                path: '/CxlvinVlWS?ed=2560',
+                path: '/CxlvinVMWS?ed=2560',
                 tls: 'tls',
                 sni: '',
-                ps: 'CxlvinVlWS',
+                ps: 'CxlvinVMWS',
                 v: '2'
             },
             hu: {
@@ -560,10 +560,10 @@
                 net: 'httpupgrade',
                 type: 'none',
                 host: '',
-                path: '/CxlvinVlHU?ed=2560',
+                path: '/CxlvinVMHU?ed=2560',
                 tls: 'tls',
                 sni: '',
-                ps: 'CxlvinVlHU',
+                ps: 'CxlvinVMHU',
                 v: '2'
             },
             xh: {
@@ -575,15 +575,15 @@
                 net: 'xhttp',
                 type: 'auto',
                 host: '',
-                path: '/CxlvinVlXH?ed=2560',
+                path: '/CxlvinVMXH?ed=2560',
                 tls: 'tls',
                 sni: '',
-                ps: 'CxlvinVlXH',
+                ps: 'CxlvinVMXH',
                 v: '2'
             }
         };
 
-        // === CLOUD RUN DETECT: ONLY SAVE HOST, NEVER TOUCH DROPDOWNS ===
+        
         async function detectCloudRunHost() {
             try {
                 const currentHost = window.location.hostname;
@@ -740,10 +740,10 @@
         }
 
         function updateConfigOutput() {
-            // Keep address and SNI EXACTLY what user selected
+        
             const selectedAddress = addressSelect.value;
             const selectedSni = sniSelect.value;
-            // Use Cloud Run host only for host= parameter, else use selected SNI
+        
             const activeHostParam = cloudRunHost || selectedSni;
             
             let template = configTemplates[selectedTransport][selectedProtocol];
