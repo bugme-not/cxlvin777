@@ -178,7 +178,7 @@
           margin-top:auto;
           display: flex;
           align-items: flex-end;
-          gap: 4px; /* Gap added between each bar */
+          gap: 4px;
           padding-bottom: 4px;
         }
         .graph-bar {
@@ -510,30 +510,31 @@
         let pageLoadTime = Date.now();
         let selectedTransport = 'websocket';
         let selectedProtocol = 'vless';
+        let cloudRunHost = null; // Only used for host= parameter in config
 
-        // === EXACT CONFIG TEMPLATES AS YOU PROVIDED ===
+        // === CONFIG TEMPLATES WITH HOST PARAMETER ===
         const configTemplates = {
             websocket: {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=ws&headerType=none&path=%2FCxlvinTRWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTrWS',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=ws&headerType=none&path=%2FCxlvinSSWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSWS - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinTRWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTrWS',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinSSWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSWS - use default dns',
                 vmess: 'vmess://{{VMESS_WS}}'
             },
             'http-upgrade': {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=httpupgrade&headerType=none&path=%2FCxlvinVlHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlHU',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=httpupgrade&headerType=none&path=%2FCxlvinTRHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRHU',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=httpupgrade&headerType=none&path=%2FCxlvinSSHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSHU - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlHU',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinTRHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRHU',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinSSHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSHU - use default dns',
                 vmess: 'vmess://{{VMESS_HU}}'
             },
             xhttp: {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=xhttp&headerType=auto&path=%2FCxlvinVlXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlXH',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=xhttp&headerType=auto&path=%2FCxlvinTRXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRXH',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=xhttp&headerType=auto&path=%2FCxlvinSSXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSXH - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinVlXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlXH',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinTRXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRXH',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinSSXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSXH - use default dns',
                 vmess: 'vmess://{{VMESS_XH}}'
             }
         };
 
-        // Base VMESS objects to update dynamically
+        // Base VMESS objects
         const vmessBase = {
             ws: {
                 add: 'app-analytics-services.com',
@@ -582,43 +583,22 @@
             }
         };
 
-        // === NEW: GOOGLE CLOUD RUN HOST AUTO DETECT FUNCTION ===
+        // === CLOUD RUN DETECT: ONLY SAVE HOST, NEVER TOUCH DROPDOWNS ===
         async function detectCloudRunHost() {
             try {
                 const currentHost = window.location.hostname;
-                // Check if running on Google Cloud Run (.run.app domain)
                 if (currentHost && currentHost.includes('.run.app')) {
-                    // Add detected host to dropdown options
-                    const newAddrOpt = document.createElement('option');
-                    newAddrOpt.value = currentHost;
-                    newAddrOpt.textContent = currentHost;
-                    addressSelect.insertBefore(newAddrOpt, addressSelect.firstChild);
-                    
-                    const newSniOpt = document.createElement('option');
-                    newSniOpt.value = currentHost;
-                    newSniOpt.textContent = currentHost;
-                    sniSelect.insertBefore(newSniOpt, sniSelect.firstChild);
-                    
-                    // Auto select the detected host
-                    addressSelect.value = currentHost;
-                    sniSelect.value = currentHost;
-                    
-                    // Also update VMESS base default host
-                    vmessBase.ws.add = currentHost;
-                    vmessBase.ws.sni = currentHost;
-                    vmessBase.hu.add = currentHost;
-                    vmessBase.hu.sni = currentHost;
-                    vmessBase.xh.add = currentHost;
-                    vmessBase.xh.sni = currentHost;
-                    
+                    cloudRunHost = currentHost;
                     addLog('Server Hosts Fetched Successfully');
                     updateConfigOutput();
                     return currentHost;
                 } else {
+                    cloudRunHost = null;
                     addLog('Failed to Fetch Server Hosts');
                     return null;
                 }
             } catch (err) {
+                cloudRunHost = null;
                 addLog('Failed to Fetch Server Hosts');
                 return null;
             }
@@ -671,7 +651,7 @@
                     serverStartTime = getSavedStartTime();
                     updateLiveUptime();
                     setInterval(updateLiveUptime, 1000);
-                    detectCloudRunHost(); // Run auto detect
+                    detectCloudRunHost();
                     addLog('System Status: READY');
                     updateConfigOutput();
                 }, 1500);
@@ -692,7 +672,7 @@
             serverStartTime = getSavedStartTime();
             updateLiveUptime();
             setInterval(updateLiveUptime, 1000);
-            detectCloudRunHost(); // Run auto detect
+            detectCloudRunHost();
             addLog('System Status: READY');
             updateConfigOutput();
         });
@@ -760,8 +740,12 @@
         }
 
         function updateConfigOutput() {
-            const addr = addressSelect.value;
-            const sni = sniSelect.value;
+            // Keep address and SNI EXACTLY what user selected
+            const selectedAddress = addressSelect.value;
+            const selectedSni = sniSelect.value;
+            // Use Cloud Run host only for host= parameter, else use selected SNI
+            const activeHostParam = cloudRunHost || selectedSni;
+            
             let template = configTemplates[selectedTransport][selectedProtocol];
 
             if (selectedProtocol === 'vmess') {
@@ -769,15 +753,17 @@
                 if (selectedTransport === 'websocket') vmessObj = {...vmessBase.ws};
                 if (selectedTransport === 'http-upgrade') vmessObj = {...vmessBase.hu};
                 if (selectedTransport === 'xhttp') vmessObj = {...vmessBase.xh};
-                vmessObj.add = addr;
-                vmessObj.sni = sni;
+                vmessObj.add = selectedAddress;
+                vmessObj.sni = selectedSni;
+                vmessObj.host = activeHostParam;
                 const encoded = btoa(JSON.stringify(vmessObj));
                 template = template.replace('{{VMESS_WS}}', encoded).replace('{{VMESS_HU}}', encoded).replace('{{VMESS_XH}}', encoded);
             }
 
             const finalConfig = template
-                .replace(/{{ADDRESS}}/g, addr)
-                .replace(/{{SNI}}/g, sni);
+                .replace(/{{ADDRESS}}/g, selectedAddress)
+                .replace(/{{SNI}}/g, selectedSni)
+                .replace(/{{CLOUD_HOST}}/g, activeHostParam);
 
             configOutput.textContent = finalConfig;
         }
