@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="preload" as="image" href="https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1">
+    <title>Cxlvin 12-in-1 Xray Multi-Protocol Server</title>
+    <style>
+        :root {
+            --white: #ffffff;
+            --glow: rgba(100, 200, 255, 0.6);
+            --stroke-radiant: rgba(0, 0, 0, 0.9);
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --shadow: 0 0 25px rgba(100, 200, 255, 0.25);
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg-base: #000000;
+            --graph-cyan: #40e0d0;
+            --status-green: #22c55e;
+            --status-yellow: #eab308;
+            --status-red: #ef4444;
+            --log-bg: rgba(255, 255, 255, 0.08);
+            --log-border: rgba(255, 255, 255, 0.15);
+            --log-text: #c0e7ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        *:not(video):not(audio):not(svg):not(path) {
+            text-shadow:
+                0 0 0.5px var(--stroke-radiant),
+                0 0 1px var(--stroke-radiant);
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--white);
+            background-color: var(--bg-base);
+            touch-action: none;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .page {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-color: var(--bg-base);
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* PAGE 1: FULL FIT NO SCROLL */
+        #page1 {
+            background-image: url('https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1');
+            background-size: 100% 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .landing-text {
+            font-size: clamp(1.1rem, 4vh, 2rem);
+            text-align: center;
+            text-shadow: 0 0 12px var(--glow);
+            animation: blink 2.5s infinite ease-in-out;
+            padding: 1rem;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* PAGE 2: ONLY VIDEO FULL VIEW PORTRAIT */
+        #page2 { background: #000; }
+        #page2 video {
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+        }
+        #page2 audio { display: none; }
+
+        /* PAGE 3: ALL LAYOUT FULLY VISIBLE NO SCROLL */
+        #page3 {
+            background-image: url('https://dl.dropboxusercontent.com/scl/fi/euucybdlohtjdijywmy3z/bg.jpg?rlkey=9genj9v3n4t4wvqzmr9xb4qro&st=7k24vd38&dl=1');
+            background-size: 100% 100%;
+            padding:8px;
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+            height:100vh;
+        }
+
+         .top-container {
+    width: calc(100% - 16px);
+    margin: 0 auto;
+    height: 200px;
+    display: grid;
+    grid-template-columns: 54% 46%;
+    gap: 8px;
+       }
+        .system-status-panel {
+            width:100%;
+            height:100%;
+            display:flex;
+            flex-direction:column;
+            padding:10px;
+            overflow:hidden;
+            background:var(--glass);
+            border:1px solid var(--glass-border);
+            border-radius:10px;
+        }
+        .status-header{
+          font-size:1rem;
+          margin-bottom:8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+       }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: slowBeat 2.2s infinite ease-in-out;
+        }
+        .status-indicator.good { background: var(--status-green); box-shadow: 0 0 6px var(--status-green);}
+        .status-indicator.medium { background: var(--status-yellow); box-shadow: 0 0 6px var(--status-yellow);}
+        .status-indicator.high { background: var(--status-red); box-shadow: 0 0 6px var(--status-red);}
+        @keyframes slowBeat {
+            0%,100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.35); opacity: 1; }
+        }
+        .status-row{
+          font-size:.85rem;
+          line-height:1.4;
+          margin:3px 0;
+          display: flex;
+          align-items: center;
+          flex-wrap: nowrap;
+          gap: 4px;
+        }
+        .status-good { color: var(--status-green); font-weight: 500; }
+        .status-wait { color: var(--status-yellow); }
+        .status-high { color: var(--status-red); 
+            text-shadow: 0 0 4px var(--status-red);
+            animation: softRadiant 2s infinite ease-in-out;
+        }
+        @keyframes softRadiant {
+            0%,100% { text-shadow: 0 0 2px var(--status-red); }
+            50% { text-shadow: 0 0 6px var(--status-red); }
+        }
+
+        .graph-container{
+          height:48px;
+          margin-top:auto;
+          display: flex;
+          align-items: flex-end;
+          gap: 4px; /* Gap added between each bar */
+          padding-bottom: 4px;
+        }
+        .graph-bar {
+            flex: 1;
+            background: var(--graph-cyan);
+            border-radius: 2px 2px 0 0;
+            box-shadow: 0 0 4px var(--graph-cyan);
+            transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            min-height: 3px;
+        }
+        .network-monitor-label{
+            font-size:.85rem;
+            margin-top: 2px;
+            text-align: center;
+        }
+        .log-panel {
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    padding:10px;
+    overflow:hidden;
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:10px;
+    font-family:'Courier New', Consolas, monospace;
+    margin-right: 8px;
+        }
+        .log-header{
+    font-size:.75rem;
+    margin-bottom:4px;
+    text-align:center;
+        }
+        .log-divider {
+    display: none;
+        }
+        .log-content{
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+    font-size:.75rem;
+    line-height:1.25;
+    text-align:left;
+        }
+       .log-entry{
+    padding:1px 0;
+    margin:0;
+    text-align:left;
+        }
+        .glass-panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 1vh 1.5vw;
+            width: 100%;
+            flex:1;
+            min-height:0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5vh;
+            overflow: hidden;
+        }
+        .page-title {
+            font-size: clamp(1rem, 3vh, 1.7rem);
+            text-align: center;
+            margin: 0.4vh 0;
+            text-shadow: 0 0 12px var(--glow);
+            font-weight: 600;
+        }
+
+        .protocol-row-top, .protocol-row-bottom {
+            display: grid;
+            gap: 0.5vw;
+            margin: 0.5vh auto;
+            justify-content: center;
+            width: 100%;
+            max-width: 700px;
+        }
+        .protocol-row-top { grid-template-columns: repeat(3, 1fr); }
+        .protocol-row-bottom { grid-template-columns: repeat(4, 1fr); }
+        .protocol-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 0.5vh 0.3vw;
+            min-height: 5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: clamp(0.7rem, 1.8vh, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .protocol-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px var(--glow);
+            border-color: var(--glow);
+        }
+        .protocol-card.selected {
+            border-color: var(--glow);
+            box-shadow: 0 0 20px var(--glow);
+            background: rgba(100, 200, 255, 0.12);
+        }
+        .config-box {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 0.6vh 1vw;
+    margin: 0.5vh 0;
+
+    width: 100%;
+    height: 100px;          
+    flex: none;             
+
+    font-family: 'Courier New', monospace;
+    font-size: clamp(0.6rem, 1.4vh, 0.85rem);
+    line-height: 1.3;
+    color: #e0f7ff;
+
+    overflow-y: auto;       
+    overflow-x: hidden;   
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+        .copy-btn {
+            display: block;
+            width: 100%;
+            padding: 0.5vh;
+            margin-top: 0.2vh;
+            background: rgba(64, 224, 208, 0.15);
+            border: 1px solid var(--graph-cyan);
+            border-radius: 6px;
+            color: var(--graph-cyan);
+            font-size: clamp(0.75rem, 1.9vh, 1rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .copy-btn:hover {
+            background: rgba(64, 224, 208, 0.3);
+            box-shadow: 0 0 12px var(--graph-cyan);
+        }
+
+        .dropdown-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1vw;
+            margin-bottom: 0.6vh;
+            width: 100%;
+        }
+        .dropdown-container label {
+            display: block;
+            margin-bottom: 0.25vh;
+            font-size: clamp(0.65rem, 1.6vh, 0.9rem);
+            opacity: 0.9;
+        }
+        select {
+            width: 100%;
+            padding: 0.4vh 0.7vw;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--white);
+            font-size: clamp(0.65rem, 1.6vh, 0.9rem);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7vw center;
+        }
+        select option { background: #0a1929; color: white; }
+
+        .quote-section {
+            text-align: center;
+            padding: 0.6vh 1vw;
+            margin-top: 0.5vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            width: 100%;
+        }
+        .quote-main {
+            font-size: clamp(0.85rem, 2.1vh, 1.2rem);
+            font-weight: 500;
+            margin-bottom: 0.2vh;
+        }
+        .quote-phonetic {
+            font-size: clamp(0.6rem, 1.4vh, 0.8rem);
+            opacity: 0.75;
+            margin-bottom: 0.2vh;
+            font-style: italic;
+        }
+        .quote-desc {
+            font-size: clamp(0.65rem, 1.5vh, 0.85rem);
+            opacity: 0.85;
+            line-height: 1.4;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="page1" class="page active">
+        <div class="landing-text">Tap anywhere to keep moving forward</div>
+    </div>
+
+    <div id="page2" class="page">
+        <video id="introVideo" muted playsinline preload="metadata">
+            <source src="https://dl.dropboxusercontent.com/scl/fi/itdb2uwp6rfaixztjid02/BG2.mp4?rlkey=y9epxvqts6klv1jpl55bq3t2z&st=711rh77s&dl=1" type="video/mp4">
+            Your browser does not support video playback
+        </video>
+        <audio id="bgAudio" preload="metadata">
+            <source src="https://dl.dropboxusercontent.com/scl/fi/ls6emguekm8vev2dgp2nx/BG2.mp3?rlkey=ht1hxxmjfwainv5ina6cppuzo&st=gjembdo0&dl=1" type="audio/mpeg">
+        
+    </div>
+
+    <div id="page3" class="page">
+        <div class="top-container">
+            <div class="system-status-panel">
+                <div class="status-header">
+                    <strong>SYSTEM STATUS</strong> 
+                    <span class="status-indicator good" id="latencyDot"></span>
+                </div>
+                <div class="status-row">Active Visitors: <span id="visitorCount" class="status-wait">Loading...</span></div>
+                <div class="status-row">YourIP: <span id="userIP" class="status-high">Loading...</span></div>
+                <div class="status-row">ServerUptime: <span id="uptime" class="status-wait">00:00:00</span></div>
+                <div class="graph-container" id="activityGraph">
+                    <div class="graph-bar" data-index="0"></div>
+                    <div class="graph-bar" data-index="1"></div>
+                    <div class="graph-bar" data-index="2"></div>
+                    <div class="graph-bar" data-index="3"></div>
+                    <div class="graph-bar" data-index="4"></div>
+                    <div class="graph-bar" data-index="5"></div>
+                    <div class="graph-bar" data-index="6"></div>
+                    <div class="graph-bar" data-index="7"></div>
+                </div>
+                <div class="network-monitor-label">PACKET FLOW MONITOR</div>
+            </div>
+
+            <div class="log-panel">
+                <div class="log-header">SYSTEM EVENT LOG</div>
+                <div class="log-divider">──────────────────────────────────────</div>
+                <div class="log-content" id="systemLog"></div>
+                <div class="log-divider">──────────────────────────────────────</div>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h1 class="page-title">Cxlvin 12-in-1 Xray Multi-Protocol Server</h1>
+
+            <div class="protocol-row-top">
+                <div class="protocol-card" data-transport="websocket">WEBSOCKET</div>
+                <div class="protocol-card" data-transport="http-upgrade">HTTP UPGRADE</div>
+                <div class="protocol-card" data-transport="xhttp">XHTTP</div>
+            </div>
+            <div class="protocol-row-bottom">
+                <div class="protocol-card" data-protocol="vless">Vless</div>
+                <div class="protocol-card" data-protocol="trojan">Trojan</div>
+                <div class="protocol-card" data-protocol="shadowsocks">Shadowsocks</div>
+                <div class="protocol-card" data-protocol="vmess">Vmess</div>
+            </div>
+
+            <!-- MOVED: Address & SNI Selection HERE -->
+            <div class="dropdown-group">
+                <div class="dropdown-container">
+                    <label>Address Selection</label>
+                    <select id="addressSelect">
+                        <option value="fcmtoken.googleapis.com">fcmtoken.googleapis.com</option>
+                        <option value="firebase-settings.crashlytics.com">firebase-settings.crashlytics.com</option>
+                        <option value="app-analytics-services.com">app-analytics-services.com</option>
+                        <option value="ssl.google-analytics.com">ssl.google-analytics.com</option>
+                        <option value="beacons.gcp.gvt2.com">beacons.gcp.gvt2.com</option>
+                        <option value="socket.gleeze.com">socket.gleeze.com</option>
+                        <option value="redirector.gvt1.com">redirector.gvt1.com</option>
+                    </select>
+                </div>
+                <div class="dropdown-container">
+                    <label>Server Name Indication</label>
+                    <select id="sniSelect">
+                        <option value="fcmtoken.googleapis.com">fcmtoken.googleapis.com</option>
+                        <option value="cdn-settings.appsflyersdk.com">cdn-settings.appsflyersdk.com</option>
+                        <option value="firebase-settings.crashlytics.com">firebase-settings.crashlytics.com</option>
+                        <option value="ssl.google-analytics.com">ssl.google-analytics.com</option>
+                        <option value="conversions.appsflyer.com">conversions.appsflyer.com</option>
+                        <option value="benefits-client-production.voyagerapis.com">benefits-client-production.voyagerapis.com</option>
+                        <option value="api-bnpl.mayabank.ph">api-bnpl.mayabank.ph</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-box" id="configOutput"></div>
+            <button class="copy-btn" id="copyConfigBtn">COPY CONFIG</button>
+
+            <div class="quote-section">
+                <div class="quote-main">keep moving forward</div>
+                <div class="quote-phonetic">/kiːp ˈmuːvɪŋ ˈfɔːrwərd/</div>
+                <div class="quote-desc">means refusing to give up, no matter how difficult the path becomes, and continuing to fight for the future you believe in.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const introVideo = document.getElementById('introVideo');
+        const bgAudio = document.getElementById('bgAudio');
+        const elVisitor = document.getElementById('visitorCount');
+        const elIP = document.getElementById('userIP');
+        const elUptime = document.getElementById('uptime');
+        const elLog = document.getElementById('systemLog');
+        const graphBars = document.querySelectorAll('.graph-bar');
+        const latencyDot = document.getElementById('latencyDot');
+        const configOutput = document.getElementById('configOutput');
+        const copyConfigBtn = document.getElementById('copyConfigBtn');
+        const addressSelect = document.getElementById('addressSelect');
+        const sniSelect = document.getElementById('sniSelect');
+        let serverStartTime = null;
+        const BACKEND_ENDPOINT = '/api/status';
+        let activityHistory = Array(8).fill(0);
+        let currentLatency = 'good';
+        let logEntries = [];
+        const MAX_LOGS = 50;
+        let pageLoadTime = Date.now();
+        let selectedTransport = 'websocket';
+        let selectedProtocol = 'vless';
+
+        // === EXACT CONFIG TEMPLATES AS YOU PROVIDED ===
+        const configTemplates = {
+            websocket: {
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=ws&headerType=none&path=%2FCxlvinTRWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTrWS',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=ws&headerType=none&path=%2FCxlvinSSWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSWS - use default dns',
+                vmess: 'vmess://{{VMESS_WS}}'
+            },
+            'http-upgrade': {
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=httpupgrade&headerType=none&path=%2FCxlvinVlHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlHU',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=httpupgrade&headerType=none&path=%2FCxlvinTRHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRHU',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=httpupgrade&headerType=none&path=%2FCxlvinSSHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSHU - use default dns',
+                vmess: 'vmess://{{VMESS_HU}}'
+            },
+            xhttp: {
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=xhttp&headerType=auto&path=%2FCxlvinVlXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlXH',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=xhttp&headerType=auto&path=%2FCxlvinTRXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRXH',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=xhttp&headerType=auto&path=%2FCxlvinSSXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSXH - use default dns',
+                vmess: 'vmess://{{VMESS_XH}}'
+            }
+        };
+
+        // Base VMESS objects to update dynamically
+        const vmessBase = {
+            ws: {
+                add: 'app-analytics-services.com',
+                port: '443',
+                id: 'cxlvin777',
+                aid: '0',
+                scy: 'auto',
+                net: 'ws',
+                type: 'none',
+                host: '',
+                path: '/CxlvinVlWS?ed=2560',
+                tls: 'tls',
+                sni: '',
+                ps: 'CxlvinVlWS',
+                v: '2'
+            },
+            hu: {
+                add: 'app-analytics-services.com',
+                port: '443',
+                id: 'cxlvin777',
+                aid: '0',
+                scy: 'auto',
+                net: 'httpupgrade',
+                type: 'none',
+                host: '',
+                path: '/CxlvinVlHU?ed=2560',
+                tls: 'tls',
+                sni: '',
+                ps: 'CxlvinVlHU',
+                v: '2'
+            },
+            xh: {
+                add: 'app-analytics-services.com',
+                port: '443',
+                id: 'cxlvin777',
+                aid: '0',
+                scy: 'auto',
+                net: 'xhttp',
+                type: 'auto',
+                host: '',
+                path: '/CxlvinVlXH?ed=2560',
+                tls: 'tls',
+                sni: '',
+                ps: 'CxlvinVlXH',
+                v: '2'
+            }
+        };
+
+        // === NEW: GOOGLE CLOUD RUN HOST AUTO DETECT FUNCTION ===
+        async function detectCloudRunHost() {
+            try {
+                const currentHost = window.location.hostname;
+                // Check if running on Google Cloud Run (.run.app domain)
+                if (currentHost && currentHost.includes('.run.app')) {
+                    // Add detected host to dropdown options
+                    const newAddrOpt = document.createElement('option');
+                    newAddrOpt.value = currentHost;
+                    newAddrOpt.textContent = currentHost;
+                    addressSelect.insertBefore(newAddrOpt, addressSelect.firstChild);
+                    
+                    const newSniOpt = document.createElement('option');
+                    newSniOpt.value = currentHost;
+                    newSniOpt.textContent = currentHost;
+                    sniSelect.insertBefore(newSniOpt, sniSelect.firstChild);
+                    
+                    // Auto select the detected host
+                    addressSelect.value = currentHost;
+                    sniSelect.value = currentHost;
+                    
+                    // Also update VMESS base default host
+                    vmessBase.ws.add = currentHost;
+                    vmessBase.ws.sni = currentHost;
+                    vmessBase.hu.add = currentHost;
+                    vmessBase.hu.sni = currentHost;
+                    vmessBase.xh.add = currentHost;
+                    vmessBase.xh.sni = currentHost;
+                    
+                    addLog('Server Hosts Fetched Successfully');
+                    updateConfigOutput();
+                    return currentHost;
+                } else {
+                    addLog('Failed to Fetch Server Hosts');
+                    return null;
+                }
+            } catch (err) {
+                addLog('Failed to Fetch Server Hosts');
+                return null;
+            }
+        }
+
+        function formatElapsedTime() {
+            const elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+            const h = String(Math.floor(elapsed / 3600)).padStart(2,'0');
+            const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2,'0');
+            const s = String(elapsed % 60).padStart(2,'0');
+            return `[+${h}:${m}:${s}]`;
+        }
+        function addLog(message) {
+            logEntries.push(`<div class="log-entry">${formatElapsedTime()} : ${message}</div>`);
+            if (logEntries.length > MAX_LOGS) logEntries.shift();
+            elLog.innerHTML = logEntries.join('');
+            elLog.scrollTop = elLog.scrollHeight;
+        }
+        function getSavedStartTime() {
+            const saved = localStorage.getItem('serverStartTime');
+            if (saved) return parseInt(saved, 10);
+            const now = Date.now();
+            localStorage.setItem('serverStartTime', now);
+            return now;
+        }
+        function formatUptime(seconds) {
+            const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+            const s = String(Math.floor(seconds % 60)).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+        function updateLiveUptime() {
+            if (!serverStartTime) return;
+            const elapsed = Math.floor((Date.now() - serverStartTime) / 1000);
+            elUptime.textContent = formatUptime(elapsed);
+        }
+
+        page1.addEventListener('click', () => {
+            page1.classList.remove('active');
+            page2.classList.add('active');
+            introVideo.play().catch(err => {
+                addLog('Video playback failed: file error');
+                setTimeout(() => {
+                    page2.classList.remove('active');
+                    page3.classList.add('active');
+                    addLog('Skipping to main interface');
+                    loadAllRealData();
+                    setInterval(updateActivityGraph, 2000);
+                    setInterval(updateLatencyStatus, 16000);
+                    serverStartTime = getSavedStartTime();
+                    updateLiveUptime();
+                    setInterval(updateLiveUptime, 1000);
+                    detectCloudRunHost(); // Run auto detect
+                    addLog('System Status: READY');
+                    updateConfigOutput();
+                }, 1500);
+            });
+            bgAudio.currentTime = 0;
+            bgAudio.play().catch(() => {});
+            addLog('User interaction: Page initiated');
+        });
+
+        introVideo.addEventListener('ended', () => {
+            page2.classList.remove('active');
+            page3.classList.add('active');
+            bgAudio.pause();
+            addLog('Server Host Online');
+            loadAllRealData();
+            setInterval(updateActivityGraph, 2000);
+            setInterval(updateLatencyStatus, 3000);
+            serverStartTime = getSavedStartTime();
+            updateLiveUptime();
+            setInterval(updateLiveUptime, 1000);
+            detectCloudRunHost(); // Run auto detect
+            addLog('System Status: READY');
+            updateConfigOutput();
+        });
+
+        document.querySelectorAll('.protocol-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.protocol-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                if (card.dataset.transport) {
+                    selectedTransport = card.dataset.transport;
+                    addLog(`Transport Selected → ${selectedTransport.toUpperCase()}`);
+                }
+                if (card.dataset.protocol) {
+                    selectedProtocol = card.dataset.protocol;
+                    addLog(`Protocol Selected → ${selectedProtocol.toUpperCase()}`);
+                }
+                updateConfigOutput();
+            });
+        });
+
+        addressSelect.addEventListener('change', () => {
+            addLog(`Address changed → ${addressSelect.value}`);
+            updateConfigOutput();
+        });
+        sniSelect.addEventListener('change', () => {
+            addLog(`SNI changed → ${sniSelect.value}`);
+            updateConfigOutput();
+        });
+
+        copyConfigBtn.addEventListener('click', async () => {
+            const text = configOutput.textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                copyConfigBtn.textContent = 'COPIED ✓';
+                addLog('Configuration Copied: SUCCESS');
+            } catch {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                copyConfigBtn.textContent = 'COPIED ✓';
+                addLog('Configuration Copied: SUCCESS');
+            }
+            setTimeout(() => copyConfigBtn.textContent = 'COPY CONFIG', 2000);
+        });
+
+        function updateActivityGraph(currentVisitors = 0) {
+            activityHistory.shift();
+            const baseValue = Math.max(1, currentVisitors || Math.floor(Math.random() * 6) + 2);
+            activityHistory.push(baseValue * (0.4 + Math.random() * 0.6));
+            const maxValue = Math.max(...activityHistory, 1);
+            graphBars.forEach((bar, idx) => {
+                bar.style.height = `${Math.max(3, (activityHistory[idx]/maxValue)*60)}px`;
+            });
+        }
+        function updateLatencyStatus() {
+            const rand = Math.random();
+            if (rand < 0.6) currentLatency = 'good';
+            else if (rand < 0.85) currentLatency = 'medium';
+            else currentLatency = 'high';
+            latencyDot.className = 'status-indicator ' + currentLatency;
+            addLog(`System Status → ${currentLatency === 'good' ? 'STABLE' : currentLatency === 'medium' ? 'ELEVATED' : 'CRITICAL'}`);
+        }
+
+        function updateConfigOutput() {
+            const addr = addressSelect.value;
+            const sni = sniSelect.value;
+            let template = configTemplates[selectedTransport][selectedProtocol];
+
+            if (selectedProtocol === 'vmess') {
+                let vmessObj;
+                if (selectedTransport === 'websocket') vmessObj = {...vmessBase.ws};
+                if (selectedTransport === 'http-upgrade') vmessObj = {...vmessBase.hu};
+                if (selectedTransport === 'xhttp') vmessObj = {...vmessBase.xh};
+                vmessObj.add = addr;
+                vmessObj.sni = sni;
+                const encoded = btoa(JSON.stringify(vmessObj));
+                template = template.replace('{{VMESS_WS}}', encoded).replace('{{VMESS_HU}}', encoded).replace('{{VMESS_XH}}', encoded);
+            }
+
+            const finalConfig = template
+                .replace(/{{ADDRESS}}/g, addr)
+                .replace(/{{SNI}}/g, sni);
+
+            configOutput.textContent = finalConfig;
+        }
+
+        async function loadAllRealData() {
+            updateActivityGraph(2);
+            updateLatencyStatus();
+            updateConfigOutput();
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                elIP.textContent = ipData.ip;
+                elIP.classList.remove('status-wait');
+                elIP.classList.add('status-high');
+                addLog('Public IP Detection: SUCCESS');
+            } catch {
+                elIP.textContent = 'Unavailable';
+                addLog('Public IP Detection: FAILED');
+            }
+            try {
+                const res = await fetch(BACKEND_ENDPOINT);
+                if (!res.ok) throw new Error('Backend offline');
+                const data = await res.json();
+                elVisitor.textContent = data.visitors.toLocaleString();
+                elVisitor.classList.remove('status-wait');
+                elVisitor.classList.add('status-good');
+                updateActivityGraph(data.visitors);
+                serverStartTime = data.server_start || getSavedStartTime();
+                addLog('Backend connection: SUCCESS');
+            } catch {
+                let localVisitors = Number(localStorage.getItem('real_visitors') || 0);
+                const lastVisit = Number(localStorage.getItem('last_visit_ts') || 0);
+                if (Date.now() - lastVisit > 300000) {
+                    localVisitors += 1;
+                    localStorage.setItem('real_visitors', localVisitors);
+                    localStorage.setItem('last_visit_ts', Date.now());
+                }
+                elVisitor.textContent = localVisitors.toLocaleString();
+                updateActivityGraph(localVisitors);
+                serverStartTime = getSavedStartTime();
+                elVisitor.classList.remove('status-wait');
+                elVisitor.classList.add('status-good');
+                addLog('Backend connection: OFFLINE - using local stats');
+            }
+        }
+    </script>
+</body>
+</html>
