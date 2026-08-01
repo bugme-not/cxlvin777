@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="preload" as="image" href="https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1">
     <title>𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲 𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</title>
     <style>
         :root {
@@ -15,7 +14,8 @@
             --glass-border: rgba(255, 255, 255, 0.15);
             --shadow: 0 0 25px rgba(100, 200, 255, 0.25);
             --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            --bg-base: #000000;
+            --bg-base: #0b0f14;
+            --bg-radiant: radial-gradient(circle at top left, #2a0845 0%, #0a0118 40%, #000000 100%);
             --graph-cyan: #40e0d0;
             --status-green: #22c55e;
             --status-yellow: #eab308;
@@ -34,7 +34,8 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        *:not(video):not(audio):not(svg):not(path) {
+        /* Modified to exclude loading text */
+        *:not(video):not(audio):not(svg):not(path):not(.loading-text) {
             text-shadow:
                 0 0 0.5px var(--stroke-radiant),
                 0 0 1px var(--stroke-radiant);
@@ -57,71 +58,148 @@
             height: 100%;
             opacity: 0;
             visibility: hidden;
-            transition: var(--transition);
+            pointer-events: none;
+            transition: opacity 1.2s ease-in-out, visibility 1.2s ease-in-out;
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-color: var(--bg-base);
             transform: translateZ(0);
             backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .page.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
-        
+        /* Page 1: radiant black purple background */
         #page1 {
-            background-image: url('https://dl.dropboxusercontent.com/scl/fi/10ooticxeilj2cznd98q2/1pBGGIF.gif?rlkey=mje0f4t2fhmv3kbq97saj94op&st=dohqvyek&dl=1');
-            background-size: 100% 100%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .landing-text {
-            font-size: clamp(1.1rem, 4vh, 2rem);
-            text-align: center;
-            text-shadow: 0 0 12px var(--glow);
-            animation: blink 7.5s infinite ease-in-out;
-            padding: 1rem;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+            background: radial-gradient(circle at top left, #2a0845 0%, #0a0118 40%, #000000 100%);
         }
 
-    
-        #page2 { background: #000; }
-        #page2 video {
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          object-position: center;
-          display: block;
+        /* Loading Screen Styles */
+        .container{
+            width:90%;
+            max-width:320px;
         }
-        #page2 audio { display: none; }
 
+        .loading-text{
+            position:relative;
+            font-size:18px;
+            font-weight:bold;
+            color:#7f8c99;
+            overflow:hidden;
+            white-space:nowrap;
+
+            /* Added as instructed */
+            text-shadow:none !important;
+            -webkit-text-stroke:0 !important;
+            filter:none !important;
+        }
+
+        .loading-text::before{
+            content:"Connecting to Server";
+            position:absolute;
+            left:0;
+            top:0;
+            width:100%;
+            height:100%;
+            color:transparent;
+            background:linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,.95) 50%,
+                transparent 100%
+            );
+            background-size:300px 100%;
+            background-repeat:no-repeat;
+            -webkit-background-clip:text;
+            background-clip:text;
+            animation:sweep 2.5s linear infinite;
+
+            /* Added as instructed */
+            text-shadow:none !important;
+            -webkit-text-stroke:0 !important;
+            filter:none !important;
+        }
+
+        @keyframes sweep{
+            from{
+                background-position:-300px;
+            }
+            to{
+                background-position:600px;
+            }
+        }
+
+        /* Animated dots */
+        .dots::after{
+            content:"";
+            animation:dots 1.5s steps(4,end) infinite;
+        }
+
+        @keyframes dots{
+            0%{content:"";}
+            25%{content:".";}
+            50%{content:"..";}
+            75%{content:"...";}
+            100%{content:"";}
+        }
+
+        /* Loading line */
+        .init-line{
+            margin-top:18px;
+            width:100%;
+            height:3px;
+            background:#222;
+            border-radius:3px;
+            overflow:hidden;
+        }
+
+        .init-line::before{
+            content:"";
+            display:block;
+            width:0%;
+            height:100%;
+            background:#fff;
+            box-shadow:0 0 10px #fff;
+            animation:loading 7s linear forwards;
+        }
+
+        @keyframes loading{
+            from{
+                width:0%;
+            }
+            to{
+                width:100%;
+            }
+        }
         
+        /* Main Interface Styles */
         #page3 {
-            background-image: url('https://dl.dropboxusercontent.com/scl/fi/euucybdlohtjdijywmy3z/bg.jpg?rlkey=9genj9v3n4t4wvqzmr9xb4qro&st=7k24vd38&dl=1');
-            background-size: 100% 100%;
+            background: var(--bg-radiant);
             padding:8px;
             display:flex;
             flex-direction:column;
             gap:6px;
             height:100vh;
+            justify-content: flex-start;
+            align-items: stretch;
         }
 
-         .top-container {
-    width: calc(100% - 16px);
-    margin: 0 auto;
-    height: 200px;
-    display: grid;
-    grid-template-columns: 54% 46%;
-    gap: 8px;
-       }
+        .top-container {
+            width: calc(100% - 16px);
+            margin: 0 auto;
+            height: 200px;
+            display: grid;
+            grid-template-columns: 54% 46%;
+            gap: 8px;
+        }
         .system-status-panel {
             width:100%;
             height:100%;
@@ -134,12 +212,12 @@
             border-radius:10px;
         }
         .status-header{
-          font-size:1rem;
-          margin-bottom:8px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-       }
+            font-size:1rem;
+            margin-bottom:8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
         .status-indicator {
             width: 10px;
             height: 10px;
@@ -154,13 +232,13 @@
             50% { transform: scale(1.35); opacity: 1; }
         }
         .status-row{
-          font-size:.85rem;
-          line-height:1.4;
-          margin:3px 0;
-          display: flex;
-          align-items: center;
-          flex-wrap: nowrap;
-          gap: 4px;
+            font-size:.85rem;
+            line-height:1.4;
+            margin:3px 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 4px;
         }
         .status-good { color: var(--status-green); font-weight: 500; }
         .status-wait { color: var(--status-yellow); }
@@ -174,12 +252,12 @@
         }
 
         .graph-container{
-          height:48px;
-          margin-top:auto;
-          display: flex;
-          align-items: flex-end;
-          gap: 4px;
-          padding-bottom: 4px;
+            height:48px;
+            margin-top:auto;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 4px;
         }
         .graph-bar {
             flex: 1;
@@ -195,39 +273,38 @@
             text-align: center;
         }
         .log-panel {
-    width:100%;
-    height:100%;
-    min-height:0;
-    display:flex;
-    flex-direction:column;
-    padding:10px;
-    overflow:hidden;
-    background:var(--glass);
-    border:1px solid var(--glass-border);
-    border-radius:10px;
-    font-family:'Courier New', Consolas, monospace;
-    margin-right: 8px;
+            width:100%;
+            height:100%;
+            min-height:0;
+            display:flex;
+            flex-direction:column;
+            padding:10px;
+            overflow:hidden;
+            background:var(--glass);
+            border:1px solid var(--glass-border);
+            border-radius:10px;
+            font-family:'Courier New', Consolas, monospace;
         }
         .log-header{
-    font-size:.75rem;
-    margin-bottom:4px;
-    text-align:center;
+            font-size:.75rem;
+            margin-bottom:4px;
+            text-align:center;
         }
         .log-divider {
-    display: none;
+            display: none;
         }
         .log-content{
-    flex:1;
-    min-height:0;
-    overflow:hidden;
-    font-size:.75rem;
-    line-height:1.25;
-    text-align:left;
+            flex:1;
+            min-height:0;
+            overflow:hidden;
+            font-size:.75rem;
+            line-height:1.25;
+            text-align:left;
         }
-       .log-entry{
-    padding:1px 0;
-    margin:0;
-    text-align:left;
+        .log-entry{
+            padding:1px 0;
+            margin:0;
+            text-align:left;
         }
         .glass-panel {
             background: var(--glass);
@@ -287,27 +364,23 @@
             background: rgba(100, 200, 255, 0.12);
         }
         .config-box {
-    background: rgba(0,0,0,0.25);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    padding: 0.6vh 1vw;
-    margin: 0.5vh 0;
-
-    width: 100%;
-    height: 100px;          
-    flex: none;             
-
-    font-family: 'Courier New', monospace;
-    font-size: clamp(0.6rem, 1.4vh, 0.85rem);
-    line-height: 1.3;
-    color: #e0f7ff;
-
-    overflow-y: auto;       
-    overflow-x: hidden;   
-
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-}
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.6vh 1vw;
+            margin: 0.5vh 0;
+            width: 100%;
+            height: 100px;          
+            flex: none;             
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.6rem, 1.4vh, 0.85rem);
+            line-height: 1.3;
+            color: #e0f7ff;
+            overflow-y: auto;       
+            overflow-x: hidden;   
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
         .copy-btn {
             display: block;
             width: 100%;
@@ -386,20 +459,17 @@
     </style>
 </head>
 <body>
+    <!-- Page 1: Loading Screen -->
     <div id="page1" class="page active">
-        <div class="landing-text">Tap anywhere to keep moving forward</div>
+        <div class="container">
+            <div class="loading-text">
+                Connecting to Server<span class="dots"></span>
+            </div>
+            <div class="init-line"></div>
+        </div>
     </div>
 
-    <div id="page2" class="page">
-        <video id="introVideo" muted playsinline preload="metadata">
-            <source src="https://dl.dropboxusercontent.com/scl/fi/itdb2uwp6rfaixztjid02/BG2.mp4?rlkey=y9epxvqts6klv1jpl55bq3t2z&st=711rh77s&dl=1" type="video/mp4">
-            Your browser does not support video playback
-        </video>
-        <audio id="bgAudio" preload="metadata">
-            <source src="https://dl.dropboxusercontent.com/scl/fi/ls6emguekm8vev2dgp2nx/BG2.mp3?rlkey=ht1hxxmjfwainv5ina6cppuzo&st=gjembdo0&dl=1" type="audio/mpeg">
-        
-    </div>
-
+    <!-- Page 3: Main Interface -->
     <div id="page3" class="page">
         <div class="top-container">
             <div class="system-status-panel">
@@ -487,10 +557,7 @@
 
     <script>
         const page1 = document.getElementById('page1');
-        const page2 = document.getElementById('page2');
         const page3 = document.getElementById('page3');
-        const introVideo = document.getElementById('introVideo');
-        const bgAudio = document.getElementById('bgAudio');
         const elVisitor = document.getElementById('visitorCount');
         const elIP = document.getElementById('userIP');
         const elUptime = document.getElementById('uptime');
@@ -636,59 +703,55 @@
             elUptime.textContent = formatUptime(elapsed);
         }
 
-        page1.addEventListener('click', () => {
-            page1.classList.remove('active');
-            page2.classList.add('active');
-            introVideo.play().catch(err => {
-                addLog('Video playback failed: file error');
-                setTimeout(() => {
-                    page2.classList.remove('active');
-                    page3.classList.add('active');
-                    addLog('Skipping to main interface');
-                    loadAllRealData();
-                    setInterval(updateActivityGraph, 2000);
-                    setInterval(updateLatencyStatus, 16000);
-                    serverStartTime = getSavedStartTime();
-                    updateLiveUptime();
-                    setInterval(updateLiveUptime, 1000);
-                    detectCloudRunHost();
-                    addLog('System Status: READY');
-                    updateConfigOutput();
-                }, 1500);
-            });
-            bgAudio.currentTime = 0;
-            bgAudio.play().catch(() => {});
-            addLog('User interaction: Page initiated');
+        // Transition from loading screen to main interface after 7 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                // Smooth simultaneous fade out/in
+                page1.classList.remove('active');
+                page3.classList.add('active');
+                
+                // Initialize main system after transition starts
+                addLog('System Initializing...');
+                loadAllRealData();
+                setInterval(updateActivityGraph, 2000);
+                setInterval(updateLatencyStatus, 16000);
+                serverStartTime = getSavedStartTime();
+                updateLiveUptime();
+                setInterval(updateLiveUptime, 1000);
+                detectCloudRunHost();
+                addLog('System Status: READY');
+                updateConfigOutput();
+            }, 7000);
         });
 
-        introVideo.addEventListener('ended', () => {
-            page2.classList.remove('active');
-            page3.classList.add('active');
-            bgAudio.pause();
-            addLog('Server Host Online');
-            loadAllRealData();
-            setInterval(updateActivityGraph, 2000);
-            setInterval(updateLatencyStatus, 3000);
-            serverStartTime = getSavedStartTime();
-            updateLiveUptime();
-            setInterval(updateLiveUptime, 1000);
-            detectCloudRunHost();
-            addLog('System Status: READY');
-            updateConfigOutput();
-        });
+        const transportCards = document.querySelectorAll('[data-transport]');
+        const protocolCards = document.querySelectorAll('[data-protocol]');
 
-        document.querySelectorAll('.protocol-card').forEach(card => {
+        let transportGlowTimer;
+
+        transportCards.forEach(card => {
             card.addEventListener('click', () => {
-                document.querySelectorAll('.protocol-card').forEach(c => c.classList.remove('selected'));
+                transportCards.forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
-                if (card.dataset.transport) {
-                    selectedTransport = card.dataset.transport;
-                    addLog(`Transport Selected → ${selectedTransport.toUpperCase()}`);
-                }
-                if (card.dataset.protocol) {
-                    selectedProtocol = card.dataset.protocol;
-                    addLog(`Protocol Selected → ${selectedProtocol.toUpperCase()}`);
-                }
+                selectedTransport = card.dataset.transport;
+                addLog(`Transport Selected → ${selectedTransport.toUpperCase()}`);
+                clearTimeout(transportGlowTimer);
+                transportGlowTimer = setTimeout(() => {
+                    if (!selectedProtocol) {
+                        card.classList.remove('selected');
+                    }
+                }, 7000);
+                updateConfigOutput();
+            });
+        });
+
+        protocolCards.forEach(card => {
+            card.addEventListener('click', () => {
+                protocolCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedProtocol = card.dataset.protocol;
+                addLog(`Protocol Selected → ${selectedProtocol.toUpperCase()}`);
+                clearTimeout(transportGlowTimer);
                 updateConfigOutput();
             });
         });
@@ -719,6 +782,13 @@
                 addLog('Configuration Copied: SUCCESS');
             }
             setTimeout(() => copyConfigBtn.textContent = 'COPY CONFIG', 2000);
+            
+            document.querySelectorAll('.protocol-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            selectedTransport = null;
+            selectedProtocol = null;
+            clearTimeout(transportGlowTimer);
         });
 
         function updateActivityGraph(currentVisitors = 0) {
