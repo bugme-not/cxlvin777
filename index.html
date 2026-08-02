@@ -701,7 +701,7 @@
             deployedServers = [];
             const currentHost = window.location.hostname;
 
-            // ✅ PRIORITY 1: Auto scan ALL servers directly from Google Cloud API
+            
             if(GCLOUD_PROJECT_ID && GCLOUD_API_TOKEN){
                 try{
                     const gcpApiUrl = `https://run.googleapis.com/v1/projects/${GCLOUD_PROJECT_ID}/locations/-/services`;
@@ -717,15 +717,15 @@
                                     if(!deployedServers.includes(hostOnly)) deployedServers.push(hostOnly);
                                 }
                             });
-                            addLog(`✅ Found ${deployedServers.length} servers from Google Cloud`);
+                            addLog(`Found ${deployedServers.length} servers from Google Cloud`);
                         }
                     }
                 }catch(err){
-                    addLog('⚠️ GCP API scan failed, falling back...');
+                    addLog('GCP API scan failed, falling back...');
                 }
             }
 
-            // ✅ PRIORITY 2: Load from your custom list file /api/servers or servers.json
+            
             if(deployedServers.length === 0){
                 try {
                     const res = await fetch(SERVERS_API, { cache: "no-store" });
@@ -734,7 +734,7 @@
                         apiList.forEach(host => {
                             if(!deployedServers.includes(host)) deployedServers.push(host);
                         });
-                        addLog(`✅ Loaded ${deployedServers.length} servers from master list`);
+                        addLog(`Loaded ${deployedServers.length} servers from master list`);
                     } else throw new Error();
                 } catch {
                     try{
@@ -744,26 +744,26 @@
                             jsonList.forEach(host => {
                                 if(!deployedServers.includes(host)) deployedServers.push(host);
                             });
-                            addLog(`✅ Loaded ${deployedServers.length} servers from backup list`);
+                            addLog(`Loaded ${deployedServers.length} servers from backup list`);
                         }
                     }catch{}
                 }
             }
 
-            // ✅ Always make sure current server you are on is included
+            
             if (currentHost.includes('.run.app') && !deployedServers.includes(currentHost)) {
                 deployedServers.push(currentHost);
-                addLog(`✅ Added current server: ${currentHost}`);
+                addLog(`Added current server: ${currentHost}`);
             }
 
-            // ✅ Final fallback if nothing found
+            
             if(deployedServers.length === 0){
                 deployedServers = [currentHost];
-                addLog('⚠️ Only current server detected');
+                addLog('Only current server detected');
             }
 
             updateServerHostDropdown();
-            addLog(`✅ Total available: ${deployedServers.length} server(s)`);
+            addLog(`Total available: ${deployedServers.length} server(s)`);
         }
 
         function updateServerHostDropdown() {
