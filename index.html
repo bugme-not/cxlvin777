@@ -213,26 +213,24 @@
             gap: 6px;
         }
        .status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    filter: blur(1px);
-    animation: slowBeat 7.1s infinite ease-in-out;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: slowBeat 7.1s infinite ease-in-out;
         }
         .status-indicator.good {
-    background: var(--status-green);
-    box-shadow: 0 0 8px var(--status-green);
-}
-
-.status-indicator.medium {
-    background: var(--status-yellow);
-    box-shadow: 0 0 8px var(--status-yellow);
-}
-
-     .status-indicator.high {
-    background: var(--status-red);
-    box-shadow: 0 0 8px var(--status-red);
-}
+            background: var(--status-green);
+            box-shadow: 0 0 8px var(--status-green);
+        }
+        .status-indicator.medium {
+            background: var(--status-yellow);
+            box-shadow: 0 0 8px var(--status-yellow);
+        }
+        .status-indicator.high {
+            background: var(--status-red);
+            box-shadow: 0 0 8px var(--status-red);
+        }
         @keyframes slowBeat {
             0%,100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.35); opacity: 1; }
@@ -257,8 +255,8 @@
             50% { text-shadow: 0 0 6px var(--status-red); }
         }
         .visitor-count {
-    color: var(--status-green);
-    font-weight: 600;
+            color: var(--status-green);
+            font-weight: 600;
         }
         .graph-container{
             height:48px;
@@ -371,7 +369,7 @@
         .protocol-card.selected {
             border-color: var(--glow);
             box-shadow: 0 0 20px var(--glow);
-            background: rgba(100, 200, 255, 0.12);
+            background: rgba(100, 200, 255,  0.12);
         }
         .config-box {
             background: rgba(0,0,0,0.25);
@@ -463,6 +461,34 @@
             max-width: 600px;
             margin: 0 auto;
         }
+
+        .server-host-controls{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            width:100%;
+            margin-top:12px;
+            justify-content:flex-start;
+        }
+
+        .fetch-btn{
+            padding:8px 14px;
+            background:rgba(64,224,208,.15);
+            border:1px solid var(--graph-cyan);
+            border-radius:6px;
+            color:var(--graph-cyan);
+            cursor:pointer;
+            transition: var(--transition);
+        }
+        .fetch-btn:hover {
+            background:rgba(64,224,208,.3);
+            box-shadow: 0 0 10px var(--graph-cyan);
+        }
+
+        #serverHostSelect{
+            flex:1;
+            max-width:220px;
+        }
     </style>
 </head>
 <body>
@@ -549,6 +575,13 @@
                 </div>
             </div>
 
+            <div class="server-host-controls">
+                <select id="serverHostSelect">
+                    <option value="">Select Server Host</option>
+                </select>
+                <button class="fetch-btn" id="fetchHostBtn">FETCH HOSTS</button>
+            </div>
+
             <div class="config-box" id="configOutput"></div>
             <button class="copy-btn" id="copyConfigBtn">COPY CONFIG</button>
 
@@ -573,8 +606,13 @@
         const copyConfigBtn = document.getElementById('copyConfigBtn');
         const addressSelect = document.getElementById('addressSelect');
         const sniSelect = document.getElementById('sniSelect');
+        const serverHostSelect = document.getElementById('serverHostSelect');
+        const fetchHostBtn = document.getElementById('fetchHostBtn');
+        const transportCards = document.querySelectorAll('[data-transport]');
+        const protocolCards = document.querySelectorAll('[data-protocol]');
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
+        const SERVERS_API = '/api/servers'; // Your endpoint that returns list of deployed servers
         let activityHistory = Array(8).fill(0);
         let currentLatency = 'good';
         let logEntries = [];
@@ -583,24 +621,28 @@
         let selectedTransport = 'websocket';
         let selectedProtocol = 'vless';
         let cloudRunHost = null; 
+        let transportGlowTimer;
+
+        // 📌 YOUR DEPLOYED SERVER LIST - add new ones here, or load from backend
+        let deployedServers = [];
 
         const configTemplates = {
             websocket: {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinTRWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTrWS',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinSSWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSWS - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=ws&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinTRWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTrWS',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=ws&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinSSWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSWS - use default dns',
                 vmess: 'vmess://{{VMESS_WS}}'
             },
             'http-upgrade': {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlHU',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinTRHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRHU',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=httpupgrade&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinSSHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSHU - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=httpupgrade&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinVlHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlHU',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=httpupgrade&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinTRHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRHU',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=httpupgrade&host={{SELECTED_HOST}}&headerType=none&path=%2FCxlvinSSHU%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSHU - use default dns',
                 vmess: 'vmess://{{VMESS_HU}}'
             },
             xhttp: {
-                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinVlXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlXH',
-                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinTRXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRXH',
-                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=xhttp&host={{CLOUD_HOST}}&headerType=auto&path=%2FCxlvinSSXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSXH - use default dns',
+                vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=xhttp&host={{SELECTED_HOST}}&headerType=auto&path=%2FCxlvinVlXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlXH',
+                trojan: 'trojan://Cxlvin777@{{ADDRESS}}:443?type=xhttp&host={{SELECTED_HOST}}&headerType=auto&path=%2FCxlvinTRXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinTRXH',
+                shadowsocks: 'ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpDeGx2aW43Nzc=@{{ADDRESS}}:443?type=xhttp&host={{SELECTED_HOST}}&headerType=auto&path=%2FCxlvinSSXH%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinSSXH - use default dns',
                 vmess: 'vmess://{{VMESS_XH}}'
             }
         };
@@ -653,22 +695,62 @@
             }
         };
         
+        // 📌 NEW FUNCTION: Fetch all deployed servers
+        async function fetchAllServers() {
+            addLog('Fetching deployed server hosts...');
+            try {
+                // Option 1: Load from your backend (use this when you have API)
+                const res = await fetch(SERVERS_API);
+                if (res.ok) {
+                    deployedServers = await res.json();
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch {
+                // Option 2: Manual list - add your new servers here anytime
+                deployedServers = [
+                    // Example: 'my-server-1.a.run.app',
+                    // 'ph-server-2.a.run.app',
+                    // 'sg-server-3.a.run.app',
+                    // Add more here when you deploy new ones
+                ];
+
+                // Auto add current host if it is Cloud Run
+                const currentHost = window.location.hostname;
+                if (currentHost.includes('.run.app') && !deployedServers.includes(currentHost)) {
+                    deployedServers.push(currentHost);
+                }
+            }
+
+            updateServerHostDropdown();
+            addLog(`Found ${deployedServers.length} server host(s)`);
+        }
+
+        // 📌 NEW FUNCTION: Refresh dropdown list
+        function updateServerHostDropdown() {
+            serverHostSelect.innerHTML = `<option value="">Select Server Host</option>`;
+            deployedServers.forEach(host => {
+                const option = document.createElement('option');
+                option.value = host;
+                option.textContent = host;
+                serverHostSelect.appendChild(option);
+            });
+        }
+
         async function detectCloudRunHost() {
             try {
                 const currentHost = window.location.hostname;
                 if (currentHost && currentHost.includes('.run.app')) {
                     cloudRunHost = currentHost;
-                    addLog('Server Hosts Fetched Successfully');
+                    addLog('Current server host detected');
                     updateConfigOutput();
                     return currentHost;
                 } else {
                     cloudRunHost = null;
-                    addLog('Failed to Fetch Server Hosts');
                     return null;
                 }
             } catch (err) {
                 cloudRunHost = null;
-                addLog('Failed to Fetch Server Hosts');
                 return null;
             }
         }
@@ -718,15 +800,11 @@
                 updateLiveUptime();
                 setInterval(updateLiveUptime, 1000);
                 detectCloudRunHost();
+                fetchAllServers(); // Auto load server list on start
                 addLog('System Status: READY');
                 updateConfigOutput();
             }, 7000);
         });
-
-        const transportCards = document.querySelectorAll('[data-transport]');
-        const protocolCards = document.querySelectorAll('[data-protocol]');
-
-        let transportGlowTimer;
 
         transportCards.forEach(card => {
             card.addEventListener('click', () => {
@@ -762,6 +840,22 @@
         sniSelect.addEventListener('change', () => {
             addLog(`SNI changed → ${sniSelect.value}`);
             updateConfigOutput();
+        });
+
+        // 📌 When user pick a server host → auto put into config
+        serverHostSelect.addEventListener('change', () => {
+            cloudRunHost = serverHostSelect.value || null;
+            if (cloudRunHost) {
+                addLog(`Server Host Selected → ${cloudRunHost}`);
+            } else {
+                addLog('No server host selected');
+            }
+            updateConfigOutput();
+        });
+
+        // 📌 Fetch button reloads the server list
+        fetchHostBtn.addEventListener('click', async () => {
+            await fetchAllServers();
         });
 
         copyConfigBtn.addEventListener('click', async () => {
@@ -811,7 +905,14 @@
         function updateConfigOutput() {
             const selectedAddress = addressSelect.value;
             const selectedSni = sniSelect.value;
+            // Use selected host, or fallback to SNI
             const activeHostParam = cloudRunHost || selectedSni;
+
+            if (!selectedTransport || !selectedProtocol || !activeHostParam) {
+                configOutput.textContent = 'Select Transport, Protocol and Server Host to generate config';
+                return;
+            }
+
             let template = configTemplates[selectedTransport][selectedProtocol];
 
             if (selectedProtocol === 'vmess') {
@@ -829,7 +930,7 @@
             const finalConfig = template
                 .replace(/{{ADDRESS}}/g, selectedAddress)
                 .replace(/{{SNI}}/g, selectedSni)
-                .replace(/{{CLOUD_HOST}}/g, activeHostParam);
+                .replace(/{{SELECTED_HOST}}/g, activeHostParam);
 
             configOutput.textContent = finalConfig;
         }
@@ -871,7 +972,7 @@
                 updateActivityGraph(localVisitors);
                 serverStartTime = getSavedStartTime();
                 elVisitor.classList.remove('status-wait');
-                elVisitor.classList.add('Status-good');
+                elVisitor.classList.add('status-good');
                 addLog('Backend connection: OFFLINE - using local stats');
             }
         }
