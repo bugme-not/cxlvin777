@@ -13,8 +13,7 @@
             --glass: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
             --shadow: 0 0 25px rgba(100, 200, 255, 0.25);
-            --transition-fast: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-page: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             --bg-base: #0b0f14;
             --bg-radiant: radial-gradient(circle at top left, #2a0845 0%, #0a0118 40%, #000000 100%);
             --graph-cyan: #40e0d0;
@@ -35,7 +34,6 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Modified to exclude loading text */
         *:not(video):not(audio):not(svg):not(path):not(.loading-text) {
             text-shadow:
                 0 0 0.5px var(--stroke-radiant),
@@ -60,36 +58,31 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: var(--transition-page);
-            transform: scale(0.96);
+            transition: opacity 1.2s ease-in-out, visibility 1.2s ease-in-out;
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
             background-color: var(--bg-base);
-            z-index: 1;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .page.active {
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
-            transform: scale(1);
-            z-index: 2;
         }
 
-        /* Page 1: radiant black purple background */
         #page1 {
             background: radial-gradient(circle at top left, #2a0845 0%, #0a0118 40%, #000000 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        /* Loading Screen Styles */
         .container{
-            width: 90%;
-            max-width: 320px;
-            text-align: center;
+            width:90%;
+            max-width:320px;
         }
 
         .loading-text{
@@ -99,8 +92,6 @@
             color:#7f8c99;
             overflow:hidden;
             white-space:nowrap;
-
-            /* Added as instructed */
             text-shadow:none !important;
             -webkit-text-stroke:0 !important;
             filter:none !important;
@@ -125,8 +116,6 @@
             -webkit-background-clip:text;
             background-clip:text;
             animation:sweep 2.5s linear infinite;
-
-            /* Added as instructed */
             text-shadow:none !important;
             -webkit-text-stroke:0 !important;
             filter:none !important;
@@ -141,7 +130,6 @@
             }
         }
 
-        /* Animated dots */
         .dots::after{
             content:"";
             animation:dots 1.5s steps(4,end) infinite;
@@ -155,7 +143,6 @@
             100%{content:"";}
         }
 
-        /* Loading line */
         .init-line{
             margin-top:18px;
             width:100%;
@@ -184,54 +171,68 @@
             }
         }
         
-        /* Main Interface Styles */
         #page3 {
             background: var(--bg-radiant);
-            padding:8px;
-            display:flex;
-            flex-direction:column;
-            gap:6px;
-            height:100vh;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
             justify-content: flex-start;
-            align-items: stretch;
+            align-items: center;
         }
 
         .top-container {
-            width: calc(100% - 16px);
+            width: 100%;
+            padding: 0 8px;
             margin: 0 auto;
             height: 200px;
             display: grid;
-            grid-template-columns: 54% 46%;
+            grid-template-columns: minmax(0, 1.17fr) minmax(0, 1fr);
             gap: 8px;
+            box-sizing: border-box;
         }
         .system-status-panel {
             width:100%;
             height:100%;
             display:flex;
             flex-direction:column;
-            padding:10px;
+            padding: 10px 10px 10px 6px;
             overflow:hidden;
             background:var(--glass);
             border:1px solid var(--glass-border);
             border-radius:10px;
-            transition: var(--transition-fast);
         }
         .status-header{
-            font-size:1rem;
+            font-size:.9rem;
             margin-bottom:8px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation: slowBeat 7.2s infinite ease-in-out;
+       .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: slowBeat 7.1s infinite ease-in-out;
         }
-        .status-indicator.good { background: var(--status-green); box-shadow: 0 0 6px var(--status-green);}
-        .status-indicator.medium { background: var(--status-yellow); box-shadow: 0 0 6px var(--status-yellow);}
-        .status-indicator.high { background: var(--status-red); box-shadow: 0 0 6px var(--status-red));}
+        .status-indicator.good {
+    background: var(--status-green);
+    box-shadow: 0 0 8px var(--status-green);
+}
+
+.status-indicator.medium {
+    background: var(--status-yellow);
+    box-shadow: 0 0 8px var(--status-yellow);
+}
+
+     .status-indicator.high {
+    background: var(--status-red);
+    box-shadow: 0 0 8px var(--status-red);
+}
         @keyframes slowBeat {
             0%,100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.35); opacity: 1; }
@@ -246,7 +247,7 @@
             gap: 4px;
         }
         .status-good { color: var(--status-green); font-weight: 500; }
-        .status-wait { color: var(--status-yellow); ) }
+        .status-wait { color: var(--status-yellow); }
         .status-high { color: var(--status-red); 
             text-shadow: 0 0 4px var(--status-red);
             animation: softRadiant 2s infinite ease-in-out;
@@ -255,7 +256,10 @@
             0%,100% { text-shadow: 0 0 2px var(--status-red); }
             50% { text-shadow: 0 0 6px var(--status-red); }
         }
-
+        .visitor-count {
+    color: var(--status-green);
+    font-weight: 600;
+        }
         .graph-container{
             height:48px;
             margin-top:auto;
@@ -269,11 +273,11 @@
             background: var(--graph-cyan);
             border-radius: 2px 2px 0 0;
             box-shadow: 0 0 4px var(--graph-cyan);
-            transition: height var(--transition-fast);
+            transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             min-height: 3px;
         }
         .network-monitor-label{
-            font-size:.85rem;
+            font-size:.67rem;
             margin-top: 2px;
             text-align: center;
         }
@@ -289,7 +293,6 @@
             border:1px solid var(--glass-border);
             border-radius:10px;
             font-family:'Courier New', Consolas, monospace;
-            transition: var(--transition-fast);
         }
         .log-header{
             font-size:.75rem;
@@ -313,18 +316,18 @@
             text-align:left;
         }
         .glass-panel {
+            width: calc(100% - 16px);
+            margin: 0 auto;
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-radius: 10px;
             padding: 1vh 1.5vw;
-            width: 100%;
-            flex:1;
-            min-height:0;
+            flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             gap: 0.5vh;
             overflow: hidden;
-            transition: var(--transition-fast);
         }
         .page-title {
             font-size: clamp(0.8rem, 2.2vh, 1.3rem);
@@ -357,7 +360,7 @@
             font-size: clamp(0.7rem, 1.8vh, 1rem);
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-fast);
+            transition: var(--transition);
             white-space: nowrap;
         }
         .protocol-card:hover {
@@ -387,7 +390,6 @@
             overflow-x: hidden;   
             white-space: pre-wrap;
             overflow-wrap: anywhere;
-            transition: var(--transition-fast);
         }
         .copy-btn {
             display: block;
@@ -401,7 +403,7 @@
             font-size: clamp(0.75rem, 1.9vh, 1rem);
             font-weight: 500;
             cursor: pointer;
-            transition: var(--transition-fast);
+            transition: var(--transition);
         }
         .copy-btn:hover {
             background: rgba(64, 224, 208, 0.3);
@@ -431,7 +433,6 @@
             font-size: clamp(0.65rem, 1.6vh, 0.9rem);
             cursor: pointer;
             appearance: none;
-            transition: var(--transition-fast);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.7vw center;
@@ -442,11 +443,7 @@
             text-align: center;
             padding: 0.6vh 1vw;
             margin-top: 0.5vh;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
             width: 100%;
-            transition: var(--transition-fast);
         }
         .quote-main {
             font-size: clamp(0.85rem, 2.1vh, 1.2rem);
@@ -466,15 +463,9 @@
             max-width: 600px;
             margin: 0 auto;
         }
-
-        /* New added styles */
-        #serverHostSelect:disabled { opacity: 0.5; cursor: not-allowed; transition: var(--transition-fast); }
-        #fetchStatus.error { color: var(--status-red); }
-        #fetchStatus.success { color: var(--status-green); }
     </style>
 </head>
 <body>
-    <!-- Page 1: Loading Screen -->
     <div id="page1" class="page active">
         <div class="container">
             <div class="loading-text">
@@ -484,17 +475,16 @@
         </div>
     </div>
 
-    <!-- Page 3: Main Interface -->
     <div id="page3" class="page">
         <div class="top-container">
             <div class="system-status-panel">
                 <div class="status-header">
-                    <strong>SYSTEM STATUS</strong> 
+                    <strong>𝐒𝐘𝐒𝐓𝐄𝐌 𝐒𝐓𝐀𝐓𝐔𝐒 </strong> 
                     <span class="status-indicator good" id="latencyDot"></span>
                 </div>
-                <div class="status-row">Active Visitors: <span id="visitorCount" class="status-wait">Loading...</span></div>
-                <div class="status-row">YourIP: <span id="userIP" class="status-high">Loading...</span></div>
-                <div class="status-row">ServerUptime: <span id="uptime" class="status-wait">00:00:00</span></div>
+                 <div class="status-row">𝐕𝐢𝐬𝐢𝐭𝐨𝐫𝐬:<span id="visitorCount" class="visitor-count">Loading...</span></div>
+                <div class="status-row">𝐘𝐨𝐮𝐫𝐈𝐏: <span id="userIP" class="status-high">Loading...</span></div>
+                <div class="status-row">𝐒𝐞𝐫𝐯𝐞𝐫𝐔𝐩𝐭𝐢𝐦𝐞: <span id="uptime" class="status-wait">00:00:00</span></div>
                 <div class="graph-container" id="activityGraph">
                     <div class="graph-bar" data-index="0"></div>
                     <div class="graph-bar" data-index="1"></div>
@@ -505,11 +495,11 @@
                     <div class="graph-bar" data-index="6"></div>
                     <div class="graph-bar" data-index="7"></div>
                 </div>
-                <div class="network-monitor-label">PACKET FLOW MONITOR</div>
+                <div class="network-monitor-label">𝐏𝐀𝐂𝐊𝐄𝐓 𝐅𝐋𝐎𝐖 𝐌𝐎𝐍𝐈𝐓𝐎𝐑</div>
             </div>
 
             <div class="log-panel">
-                <div class="log-header">SYSTEM EVENT LOG</div>
+                <div class="log-header">𝐒𝐘𝐒𝐓𝐄𝐌 𝐄𝐕𝐄𝐍𝐓 𝐋𝐎𝐆</div>
                 <div class="log-divider">──────────────────────────────────────</div>
                 <div class="log-content" id="systemLog"></div>
                 <div class="log-divider">──────────────────────────────────────</div>
@@ -567,19 +557,6 @@
                 <div class="quote-phonetic">/kiːp ˈmuːvɪŋ ˈfɔːrwərd/</div>
                 <div class="quote-desc">means refusing to give up, no matter how difficult the path becomes, and continuing to fight for the future you believe in.</div>
             </div>
-
-            <!-- New Feature Added Below -->
-            <div class="quote-section">
-                <button class="copy-btn" id="fetchHostsBtn">📡 Fetch Available Server Hosts</button>
-                <div style="margin-top: 8px;">
-                    <label style="display:block; margin-bottom: 4px; font-size:0.9rem;">Select Server:</label>
-                    <select id="serverHostSelect" disabled>
-                        <option value="">-- Click Fetch First --</option>
-                    </select>
-                </div>
-                <div id="fetchStatus" style="margin-top:6px; font-size:0.8rem; opacity:0.8;"></div>
-            </div>
-            <!-- End New Feature -->
         </div>
     </div>
 
@@ -607,13 +584,6 @@
         let selectedProtocol = 'vless';
         let cloudRunHost = null; 
 
-        // New feature variables
-        const fetchHostsBtn = document.getElementById('fetchHostsBtn');
-        const serverHostSelect = document.getElementById('serverHostSelect');
-        const fetchStatus = document.getElementById('fetchStatus');
-        const WORKER_API = 'https://cxlvin777.d4em0n35.workers.dev/api/get-hosts';
-
-        
         const configTemplates = {
             websocket: {
                 vless: 'vless://cxlvin777@{{ADDRESS}}:443?encryption=none&type=ws&host={{CLOUD_HOST}}&headerType=none&path=%2FCxlvinVlWS%3Fed%3D2560&security=tls&sni={{SNI}}#CxlvinVlWS',
@@ -635,7 +605,6 @@
             }
         };
 
-        
         const vmessBase = {
             ws: {
                 add: 'app-analytics-services.com',
@@ -683,7 +652,6 @@
                 v: '2'
             }
         };
-
         
         async function detectCloudRunHost() {
             try {
@@ -695,7 +663,7 @@
                     return currentHost;
                 } else {
                     cloudRunHost = null;
-                    addLog('No default server host detected');
+                    addLog('Failed to Fetch Server Hosts');
                     return null;
                 }
             } catch (err) {
@@ -737,7 +705,6 @@
             elUptime.textContent = formatUptime(elapsed);
         }
 
-        // Transition from loading screen to main interface after 7 seconds
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 page1.classList.remove('active');
@@ -823,60 +790,6 @@
             clearTimeout(transportGlowTimer);
         });
 
-        // Improved fetch feature functions
-        fetchHostsBtn.addEventListener('click', async () => {
-            fetchHostsBtn.disabled = true;
-            fetchHostsBtn.textContent = '⏳ Fetching...';
-            fetchStatus.textContent = '';
-            fetchStatus.className = '';
-            serverHostSelect.innerHTML = '<option value="">Loading...</option>';
-            serverHostSelect.disabled = true;
-
-            try {
-                // Timeout after 10s if no response
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-
-                const res = await fetch(WORKER_API, {
-                    signal: controller.signal,
-                    mode: 'cors'
-                });
-                clearTimeout(timeout);
-
-                if (!res.ok) throw new Error(`Server error: ${res.status}`);
-                
-                const hostList = await res.json();
-                if (!Array.isArray(hostList)) throw new Error('Invalid data received');
-                
-                serverHostSelect.innerHTML = '<option value="">-- Choose Server --</option>';
-                hostList.forEach(h => {
-                    if(h.host) serverHostSelect.innerHTML += `<option value="${h.host}">${h.name || h.host}</option>`;
-                });
-
-                serverHostSelect.disabled = false;
-                fetchStatus.textContent = `✅ Successfully loaded ${hostList.length} servers`;
-                fetchStatus.className = 'success';
-                addLog(`Server List: ${hostList.length} loaded successfully`);
-
-            } catch (err) {
-                fetchStatus.textContent = `❌ Error: ${err.message}`;
-                fetchStatus.className = 'error';
-                serverHostSelect.innerHTML = '<option value="">-- Try Again --</option>';
-                addLog(`Fetch Hosts FAILED: ${err.message}`);
-            } finally {
-                fetchHostsBtn.disabled = false;
-                fetchHostsBtn.textContent = '📡 Fetch Available Server Hosts';
-            }
-        });
-
-        serverHostSelect.addEventListener('change', () => {
-            if (serverHostSelect.value) {
-                cloudRunHost = serverHostSelect.value;
-                updateConfigOutput();
-                addLog(`Selected Server Host → ${cloudRunHost}`);
-            }
-        });
-
         function updateActivityGraph(currentVisitors = 0) {
             activityHistory.shift();
             const baseValue = Math.max(1, currentVisitors || Math.floor(Math.random() * 6) + 2);
@@ -896,12 +809,9 @@
         }
 
         function updateConfigOutput() {
-        
             const selectedAddress = addressSelect.value;
             const selectedSni = sniSelect.value;
-        
             const activeHostParam = cloudRunHost || selectedSni;
-            
             let template = configTemplates[selectedTransport][selectedProtocol];
 
             if (selectedProtocol === 'vmess') {
@@ -961,7 +871,7 @@
                 updateActivityGraph(localVisitors);
                 serverStartTime = getSavedStartTime();
                 elVisitor.classList.remove('status-wait');
-                elVisitor.classList.add('status-good');
+                elVisitor.classList.add('Status-good');
                 addLog('Backend connection: OFFLINE - using local stats');
             }
         }
