@@ -612,7 +612,9 @@
         const protocolCards = document.querySelectorAll('[data-protocol]');
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
-        const SERVERS_API = '/api/servers'; // Your endpoint that returns list of deployed servers
+        const SERVERS_API = '/api/servers';
+        const GCLOUD_PROJECT_ID = ''; // FILL YOUR GCP PROJECT ID HERE FOR FULL AUTO SCAN
+        const GCLOUD_API_TOKEN = ''; // FILL YOUR SERVICE ACCOUNT / API TOKEN HERE
         let activityHistory = Array(8).fill(0);
         let currentLatency = 'good';
         let logEntries = [];
@@ -623,7 +625,6 @@
         let cloudRunHost = null; 
         let transportGlowTimer;
 
-        // 📌 YOUR DEPLOYED SERVER LIST - add new ones here, or load from backend
         let deployedServers = [];
 
         const configTemplates = {
@@ -695,38 +696,76 @@
             }
         };
         
-        // 📌 NEW FUNCTION: Fetch all deployed servers
         async function fetchAllServers() {
-            addLog('Fetching deployed server hosts...');
-            try {
-                // Option 1: Load from your backend (use this when you have API)
-                const res = await fetch(SERVERS_API);
-                if (res.ok) {
-                    deployedServers = await res.json();
-                } else {
-                    throw new Error('API not available');
-                }
-            } catch {
-                // Option 2: Manual list - add your new servers here anytime
-                deployedServers = [
-                    // Example: 'my-server-1.a.run.app',
-                    // 'ph-server-2.a.run.app',
-                    // 'sg-server-3.a.run.app',
-                    // Add more here when you deploy new ones
-                ];
+            addLog('Scanning all deployed Cloud Run servers...');
+            deployedServers = [];
+            const currentHost = window.location.hostname;
 
-                // Auto add current host if it is Cloud Run
-                const currentHost = window.location.hostname;
-                if (currentHost.includes('.run.app') && !deployedServers.includes(currentHost)) {
-                    deployedServers.push(currentHost);
+            // ✅ PRIORITY 1: Auto scan ALL servers directly from Google Cloud API
+            if(GCLOUD_PROJECT_ID && GCLOUD_API_TOKEN){
+                try{
+                    const gcpApiUrl = `https://run.googleapis.com/v1/projects/${GCLOUD_PROJECT_ID}/locations/-/services`;
+                    const gcpRes = await fetch(gcpApiUrl, {
+                        headers: { Authorization: `Bearer ${GCLOUD_API_TOKEN}` }
+                    });
+                    if(gcpRes.ok){
+                        const gcpData = await gcpRes.json();
+                        if(gcpData.items){
+                            gcpData.items.forEach(service => {
+                                if(service.status && service.status.url && service.status.url.includes('.run.app')){
+                                    const hostOnly = service.status.url.replace('https://','');
+                                    if(!deployedServers.includes(hostOnly)) deployedServers.push(hostOnly);
+                                }
+                            });
+                            addLog(`✅ Found ${deployedServers.length} servers from Google Cloud`);
+                        }
+                    }
+                }catch(err){
+                    addLog('⚠️ GCP API scan failed, falling back...');
                 }
             }
 
+            // ✅ PRIORITY 2: Load from your custom list file /api/servers or servers.json
+            if(deployedServers.length === 0){
+                try {
+                    const res = await fetch(SERVERS_API, { cache: "no-store" });
+                    if (res.ok) {
+                        const apiList = await res.json();
+                        apiList.forEach(host => {
+                            if(!deployedServers.includes(host)) deployedServers.push(host);
+                        });
+                        addLog(`✅ Loaded ${deployedServers.length} servers from master list`);
+                    } else throw new Error();
+                } catch {
+                    try{
+                        const fallbackRes = await fetch('./all-servers.json', { cache: "no-store" });
+                        if(fallbackRes.ok){
+                            const jsonList = await fallbackRes.json();
+                            jsonList.forEach(host => {
+                                if(!deployedServers.includes(host)) deployedServers.push(host);
+                            });
+                            addLog(`✅ Loaded ${deployedServers.length} servers from backup list`);
+                        }
+                    }catch{}
+                }
+            }
+
+            // ✅ Always make sure current server you are on is included
+            if (currentHost.includes('.run.app') && !deployedServers.includes(currentHost)) {
+                deployedServers.push(currentHost);
+                addLog(`✅ Added current server: ${currentHost}`);
+            }
+
+            // ✅ Final fallback if nothing found
+            if(deployedServers.length === 0){
+                deployedServers = [currentHost];
+                addLog('⚠️ Only current server detected');
+            }
+
             updateServerHostDropdown();
-            addLog(`Found ${deployedServers.length} server host(s)`);
+            addLog(`✅ Total available: ${deployedServers.length} server(s)`);
         }
 
-        // 📌 NEW FUNCTION: Refresh dropdown list
         function updateServerHostDropdown() {
             serverHostSelect.innerHTML = `<option value="">Select Server Host</option>`;
             deployedServers.forEach(host => {
@@ -800,7 +839,7 @@
                 updateLiveUptime();
                 setInterval(updateLiveUptime, 1000);
                 detectCloudRunHost();
-                fetchAllServers(); // Auto load server list on start
+                fetchAllServers();
                 addLog('System Status: READY');
                 updateConfigOutput();
             }, 7000);
@@ -842,7 +881,6 @@
             updateConfigOutput();
         });
 
-        // 📌 When user pick a server host → auto put into config
         serverHostSelect.addEventListener('change', () => {
             cloudRunHost = serverHostSelect.value || null;
             if (cloudRunHost) {
@@ -853,7 +891,6 @@
             updateConfigOutput();
         });
 
-        // 📌 Fetch button reloads the server list
         fetchHostBtn.addEventListener('click', async () => {
             await fetchAllServers();
         });
@@ -905,7 +942,6 @@
         function updateConfigOutput() {
             const selectedAddress = addressSelect.value;
             const selectedSni = sniSelect.value;
-            // Use selected host, or fallback to SNI
             const activeHostParam = cloudRunHost || selectedSni;
 
             if (!selectedTransport || !selectedProtocol || !activeHostParam) {
