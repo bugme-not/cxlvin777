@@ -612,9 +612,18 @@
         const protocolCards = document.querySelectorAll('[data-protocol]');
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
-        const SERVERS_API = '/api/servers';
-        const GCLOUD_PROJECT_ID = ''; // FILL YOUR GCP PROJECT ID HERE FOR FULL AUTO SCAN
-        const GCLOUD_API_TOKEN = ''; // FILL YOUR SERVICE ACCOUNT / API TOKEN HERE
+
+        
+        const MASTER_LIST_URL = ''; 
+
+        
+        let deployedServers = [
+            "cxlvin-22d733-2tb4hqsf2a-uc.a.run.app",
+            "cxlvin-629d3d-2tb4hqsf2a-uc.a.run.app",
+            "cxlvin-397082-2tb4hqsf2a-uc.a.run.app",
+            "cxlvin-07cab7-2tb4hqsf2a-uc.a.run.app"
+        ];
+
         let activityHistory = Array(8).fill(0);
         let currentLatency = 'good';
         let logEntries = [];
@@ -624,8 +633,6 @@
         let selectedProtocol = 'vless';
         let cloudRunHost = null; 
         let transportGlowTimer;
-
-        let deployedServers = [];
 
         const configTemplates = {
             websocket: {
@@ -697,56 +704,27 @@
         };
         
         async function fetchAllServers() {
-            addLog('Scanning all deployed Cloud Run servers...');
-            deployedServers = [];
+            addLog('Loading latest server list...');
+            const originalCount = deployedServers.length;
             const currentHost = window.location.hostname;
 
             
-            if(GCLOUD_PROJECT_ID && GCLOUD_API_TOKEN){
-                try{
-                    const gcpApiUrl = `https://run.googleapis.com/v1/projects/${GCLOUD_PROJECT_ID}/locations/-/services`;
-                    const gcpRes = await fetch(gcpApiUrl, {
-                        headers: { Authorization: `Bearer ${GCLOUD_API_TOKEN}` }
-                    });
-                    if(gcpRes.ok){
-                        const gcpData = await gcpRes.json();
-                        if(gcpData.items){
-                            gcpData.items.forEach(service => {
-                                if(service.status && service.status.url && service.status.url.includes('.run.app')){
-                                    const hostOnly = service.status.url.replace('https://','');
-                                    if(!deployedServers.includes(hostOnly)) deployedServers.push(hostOnly);
-                                }
-                            });
-                            addLog(`Found ${deployedServers.length} servers from Google Cloud`);
-                        }
-                    }
-                }catch(err){
-                    addLog('GCP API scan failed, falling back...');
-                }
-            }
-
-            
-            if(deployedServers.length === 0){
+            if(MASTER_LIST_URL){
                 try {
-                    const res = await fetch(SERVERS_API, { cache: "no-store" });
+                    const res = await fetch(MASTER_LIST_URL, { cache: "no-store" });
                     if (res.ok) {
-                        const apiList = await res.json();
-                        apiList.forEach(host => {
-                            if(!deployedServers.includes(host)) deployedServers.push(host);
+                        const updatedList = await res.json();
+                        deployedServers = [];
+                        updatedList.forEach(host => {
+                            host = host.trim().replace('https://','').replace('/','');
+                            if(host.includes('.run.app') && !deployedServers.includes(host)){
+                                deployedServers.push(host);
+                            }
                         });
-                        addLog(`Loaded ${deployedServers.length} servers from master list`);
-                    } else throw new Error();
+                        addLog(`Updated list loaded from master source`);
+                    }
                 } catch {
-                    try{
-                        const fallbackRes = await fetch('./all-servers.json', { cache: "no-store" });
-                        if(fallbackRes.ok){
-                            const jsonList = await fallbackRes.json();
-                            jsonList.forEach(host => {
-                                if(!deployedServers.includes(host)) deployedServers.push(host);
-                            });
-                            addLog(`Loaded ${deployedServers.length} servers from backup list`);
-                        }
-                    }catch{}
+                    addLog('Cannot access master list, using saved list');
                 }
             }
 
@@ -756,14 +734,8 @@
                 addLog(`Added current server: ${currentHost}`);
             }
 
-            
-            if(deployedServers.length === 0){
-                deployedServers = [currentHost];
-                addLog('Only current server detected');
-            }
-
             updateServerHostDropdown();
-            addLog(`Total available: ${deployedServers.length} server(s)`);
+            addLog(`Total ${deployedServers.length} server(s) available`);
         }
 
         function updateServerHostDropdown() {
