@@ -17,7 +17,10 @@
             --bg-base: #0b0f14;
             --bg-radiant: radial-gradient(circle at top left, #2a0845 0%, #0a0118 40%, #000000 100%);
             --graph-cyan: #40e0d0;
-            --status-green: #22c55e;
+            --status-green: #10b981;
+            --status-green-soft: rgba(16, 185, 129, 0.08);
+            --status-green-border: rgba(16, 185, 129, 0.25);
+            --status-text: #d1fae5;
             --status-yellow: #eab308;
             --status-red: #ef4444;
             --log-bg: rgba(255, 255, 255, 0.08);
@@ -34,7 +37,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        *:not(video):not(audio):not(svg):not(path):not(.loading-text) {
+        *:not(video):not(audio):not(svg):not(path):not(.loading-text):not(.center-loading-text):not(.fetch-loading-text) {
             text-shadow:
                 0 0 0.5px var(--stroke-radiant),
                 0 0 1px var(--stroke-radiant);
@@ -394,20 +397,44 @@
             width: 100%;
             padding: 0.5vh;
             margin-top: 0.2vh;
-            background: rgba(64, 224, 208, 0.15);
-            border: 1px solid var(--graph-cyan);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
             border-radius: 6px;
-            color: var(--graph-cyan);
+            color: var(--white);
             font-size: clamp(0.75rem, 1.9vh, 1rem);
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
         }
+
         .copy-btn:hover {
-            background: rgba(64, 224, 208, 0.3);
-            box-shadow: 0 0 12px var(--graph-cyan);
+            border-color: var(--glass-border);
+            background: var(--glass);
+            color: var(--white);
         }
 
+        .copy-btn.copied {
+            background: rgba(34,197,94,.18);
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+        .copy-btn {
+            display: block;
+            width: 100%;
+            padding: 0.5vh;
+            margin-top: 0.2vh;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--white);
+            font-size: clamp(0.75rem, 1.9vh, 1rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
         .dropdown-group {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -473,25 +500,152 @@
 
         .fetch-btn{
             padding:8px 14px;
-            background:rgba(64,224,208,.15);
-            border:1px solid var(--graph-cyan);
+            background:var(--glass);
+            border:1px solid var(--glass-border);
             border-radius:6px;
-            color:var(--graph-cyan);
+            color:var(--white);
             cursor:pointer;
-            transition: var(--transition);
-        }
-        .fetch-btn:hover {
-            background:rgba(64,224,208,.3);
-            box-shadow: 0 0 10px var(--graph-cyan);
+            transition:var(--transition);
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
 
+        .fetch-btn:hover{
+            border-color: var(--glow);
+            box-shadow: 0 0 15px var(--glow);
+        }
+        .fetch-btn.active-glow{
+            border-color: var(--glow);
+            box-shadow: 0 0 20px var(--glow);
+            background: rgba(100, 200, 255, 0.12);
+        }
+        .copy-btn:focus,
+        .copy-btn:active,
+        .fetch-btn:focus,
+        .fetch-btn:active {
+            outline: none;
+            box-shadow: none;
+        }
         #serverHostSelect{
             flex:1;
             max-width:220px;
         }
+        #serverHostSelect:disabled{
+            opacity: .5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .center-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 10, 15, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0;
+            z-index: 999;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .center-loading-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .center-loading-overlay.closing {
+            opacity: 0;
+        }
+
+        .fetch-loading-wrapper {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .fetch-loading-wrapper.hidden {
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .fetch-loading-text{
+            position:relative;
+            font-size:17px;
+            font-weight:600;
+            color:#94a3b8;
+            overflow:hidden;
+            white-space:nowrap;
+            text-shadow:none !important;
+            -webkit-text-stroke:0 !important;
+            filter:none !important;
+            letter-spacing: 0.2px;
+        }
+        .fetch-loading-text::before{
+            content:"Fetching Server Hosts";
+            position:absolute;
+            left:0;
+            top:0;
+            width:100%;
+            height:100%;
+            color:transparent;
+            background:linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.9) 50%,
+                transparent 100%
+            );
+            background-size:300px 100%;
+            background-repeat:no-repeat;
+            -webkit-background-clip:text;
+            background-clip:text;
+            animation:sweep 2.5s linear infinite;
+            text-shadow:none !important;
+            -webkit-text-stroke:0 !important;
+            filter:none !important;
+        }
+
+        .success-popup {
+            background: var(--status-green-soft);
+            border: 1px solid var(--status-green-border);
+            color: var(--status-text);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.4s ease;
+            text-shadow: none !important;
+            margin-top: 0;
+            letter-spacing: 0.3px;
+            position: absolute;
+        }
+        .success-popup.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
+    <div class="center-loading-overlay" id="fetchOverlay">
+        <div class="container">
+            <div class="fetch-loading-wrapper" id="fetchLoadingWrapper">
+                <div class="fetch-loading-text" id="fetchLoadingText">
+                    Fetching Server Hosts<span class="dots"></span>
+                </div>
+                <div class="fetch-progress-line"></div>
+            </div>
+            <div class="success-popup" id="successMsg">
+                Server hosts fetched successfully 
+            </div>
+        </div>
+    </div>
+
     <div id="page1" class="page active">
         <div class="container">
             <div class="loading-text">
@@ -517,7 +671,6 @@
                     <div class="graph-bar" data-index="2"></div>
                     <div class="graph-bar" data-index="3"></div>
                     <div class="graph-bar" data-index="4"></div>
-                    <div class="graph-bar" data-index="5"></div>
                     <div class="graph-bar" data-index="6"></div>
                     <div class="graph-bar" data-index="7"></div>
                 </div>
@@ -576,14 +729,14 @@
             </div>
 
             <div class="server-host-controls">
-                <select id="serverHostSelect">
+                <select id="serverHostSelect" disabled>
                     <option value="">Select Server Host</option>
                 </select>
                 <button class="fetch-btn" id="fetchHostBtn">FETCH HOSTS</button>
             </div>
 
             <div class="config-box" id="configOutput"></div>
-            <button class="copy-btn" id="copyConfigBtn">COPY CONFIG</button>
+            <button class="copy-btn" id="copyConfigBtn" disabled>COPY CONFIG</button>
 
             <div class="quote-section">
                 <div class="quote-main">keep moving forward</div>
@@ -610,15 +763,20 @@
         const fetchHostBtn = document.getElementById('fetchHostBtn');
         const transportCards = document.querySelectorAll('[data-transport]');
         const protocolCards = document.querySelectorAll('[data-protocol]');
+        const fetchOverlay = document.getElementById('fetchOverlay');
+        const successMsg = document.getElementById('successMsg');
+        const fetchLoadingText = document.getElementById('fetchLoadingText');
+        const fetchLoadingWrapper = document.getElementById('fetchLoadingWrapper');
+
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
-
         
         const MASTER_LIST_URL = ''; 
 
-        
         let deployedServers = [
             "cxlvin-22d733-2tb4hqsf2a-uc.a.run.app",
+             "cxlvin-2wd733-2tb4hqsf2a-uc.a.run.app",
+             "cxlvin-q2d733-2tb4hqsf2a-uc.a.run.app",
             "cxlvin-629d3d-2tb4hqsf2a-uc.a.run.app",
             "cxlvin-397082-2tb4hqsf2a-uc.a.run.app",
             "cxlvin-07cab7-2tb4hqsf2a-uc.a.run.app"
@@ -629,7 +787,7 @@
         let logEntries = [];
         const MAX_LOGS = 50;
         let pageLoadTime = Date.now();
-        let selectedTransport = 'websocket';
+        let selectedTransport = null;
         let selectedProtocol = 'vless';
         let cloudRunHost = null; 
         let transportGlowTimer;
@@ -708,7 +866,6 @@
             const originalCount = deployedServers.length;
             const currentHost = window.location.hostname;
 
-            
             if(MASTER_LIST_URL){
                 try {
                     const res = await fetch(MASTER_LIST_URL, { cache: "no-store" });
@@ -728,14 +885,12 @@
                 }
             }
 
-            
             if (currentHost.includes('.run.app') && !deployedServers.includes(currentHost)) {
                 deployedServers.push(currentHost);
                 addLog(`Added current server: ${currentHost}`);
             }
 
             updateServerHostDropdown();
-            addLog(`Total ${deployedServers.length} server(s) available`);
         }
 
         function updateServerHostDropdown() {
@@ -770,7 +925,7 @@
             const elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
             const h = String(Math.floor(elapsed / 3600)).padStart(2,'0');
             const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2,'0');
-            const s = String(elapsed % 60).padStart(2,'0');
+            const s = String(Math.floor(elapsed % 60)).padStart(2,'0');
             return `[+${h}:${m}:${s}]`;
         }
         function addLog(message) {
@@ -789,7 +944,7 @@
         function formatUptime(seconds) {
             const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
             const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-            const s = String(Math.floor(seconds % 60)).padStart(2, '0');
+            const s = String(Math.floor(seconds % 60)).padStart(2,'0');
             return `${h}:${m}:${s}`;
         }
         function updateLiveUptime() {
@@ -855,24 +1010,65 @@
 
         serverHostSelect.addEventListener('change', () => {
             cloudRunHost = serverHostSelect.value || null;
+
             if (cloudRunHost) {
                 addLog(`Server Host Selected → ${cloudRunHost}`);
+                copyConfigBtn.disabled = false;
+                fetchHostBtn.classList.remove('active-glow');
             } else {
                 addLog('No server host selected');
+                copyConfigBtn.disabled = true;
             }
+
             updateConfigOutput();
         });
 
         fetchHostBtn.addEventListener('click', async () => {
+             
+            fetchHostBtn.disabled = true;
+            fetchHostBtn.textContent = 'FETCHING...';
+            fetchHostBtn.classList.add('active-glow');
+            
+            fetchOverlay.classList.remove('active', 'closing');
+            void fetchOverlay.offsetWidth;
+            fetchLoadingWrapper.classList.remove('hidden');
+            successMsg.classList.remove('show');
+            fetchOverlay.classList.add('active');
+
             await fetchAllServers();
+serverHostSelect.disabled = false;
+
+addLog(`Total ${deployedServers.length} server(s) available`);
+
+            setTimeout(() => {
+                fetchLoadingWrapper.classList.add('hidden');
+
+                setTimeout(() => {
+                    successMsg.classList.add('show');
+
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                        setTimeout(() => {
+                            fetchOverlay.classList.add('closing');
+                            setTimeout(() => {
+                                fetchOverlay.classList.remove('active', 'closing');
+                            }, 400);
+                        }, 400);
+                    }, 4000);
+
+                }, 300);
+
+            }, 7000);
+
+            fetchHostBtn.textContent = 'FETCH HOSTS';
+            fetchHostBtn.disabled = false;
         });
 
         copyConfigBtn.addEventListener('click', async () => {
             const text = configOutput.textContent;
+
             try {
                 await navigator.clipboard.writeText(text);
-                copyConfigBtn.textContent = 'COPIED ✓';
-                addLog('Configuration Copied: SUCCESS');
             } catch {
                 const ta = document.createElement('textarea');
                 ta.value = text;
@@ -880,14 +1076,21 @@
                 ta.select();
                 document.execCommand('copy');
                 document.body.removeChild(ta);
-                copyConfigBtn.textContent = 'COPIED ✓';
-                addLog('Configuration Copied: SUCCESS');
             }
-            setTimeout(() => copyConfigBtn.textContent = 'COPY CONFIG', 2000);
-            
+
+            copyConfigBtn.textContent = 'COPIED ✓';
+            copyConfigBtn.classList.add('copied');
+            addLog('Configuration Copied: SUCCESS');
+
+            setTimeout(() => {
+                copyConfigBtn.textContent = 'COPY CONFIG';
+                copyConfigBtn.classList.remove('copied');
+            }, 2000);
+
             document.querySelectorAll('.protocol-card').forEach(card => {
                 card.classList.remove('selected');
             });
+
             selectedTransport = null;
             selectedProtocol = null;
             clearTimeout(transportGlowTimer);
@@ -944,7 +1147,7 @@
         }
 
         async function loadAllRealData() {
-            updateActivityGraph(2);
+            updateActivityGraph();
             updateLatencyStatus();
             updateConfigOutput();
             try {
@@ -952,38 +1155,24 @@
                 const ipData = await ipRes.json();
                 elIP.textContent = ipData.ip;
                 elIP.classList.remove('status-wait');
-                elIP.classList.add('status-high');
-                addLog('Public IP Detection: SUCCESS');
-            } catch {
+                elIP.classList.add('status-high')
+                addLog(`Public IP detected: ${ipData.ip}`);
+            } catch (err) {
                 elIP.textContent = 'Unavailable';
-                addLog('Public IP Detection: FAILED');
+                addLog('Could not fetch public IP');
             }
+
             try {
-                const res = await fetch(BACKEND_ENDPOINT);
-                if (!res.ok) throw new Error('Backend offline');
-                const data = await res.json();
-                elVisitor.textContent = data.visitors.toLocaleString();
-                elVisitor.classList.remove('status-wait');
-                elVisitor.classList.add('status-good');
-                updateActivityGraph(data.visitors);
-                serverStartTime = data.server_start || getSavedStartTime();
-                addLog('Backend connection: SUCCESS');
-            } catch {
-                let localVisitors = Number(localStorage.getItem('real_visitors') || 0);
-                const lastVisit = Number(localStorage.getItem('last_visit_ts') || 0);
-                if (Date.now() - lastVisit > 300000) {
-                    localVisitors += 1;
-                    localStorage.setItem('real_visitors', localVisitors);
-                    localStorage.setItem('last_visit_ts', Date.now());
-                }
-                elVisitor.textContent = localVisitors.toLocaleString();
-                updateActivityGraph(localVisitors);
-                serverStartTime = getSavedStartTime();
-                elVisitor.classList.remove('status-wait');
-                elVisitor.classList.add('status-good');
-                addLog('Backend connection: OFFLINE - using local stats');
+                const visitorRes = await fetch('https://api.countapi.xyz/hit/cxlvin-server/visits');
+                const visitorData = await visitorRes.json();
+                elVisitor.textContent = visitorData.value;
+                addLog(`Total visitors: ${visitorData.value}`);
+            } catch (err) {
+                elVisitor.textContent = '1';
+                addLog('Visitor count offline');
             }
         }
     </script>
 </body>
 </html>
+
