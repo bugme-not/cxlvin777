@@ -1,0 +1,12 @@
+{
+    "deployed_servers": [
+        "server1.run.app",
+        "server2.run.app",
+        "server3.run.app",
+        "server4.run.app",
+        "server5.run.app",
+        "server6.run.app",
+        "server7.run.app",
+        "server8.run.app"
+    ]
+}
