@@ -1,6 +1,9 @@
 {
     "master_urls": [
-        "https://cxlvin-7d4f7b-c3nzgiaa4a-uc.a.run.app/server.json"
+        "https://cxlvin-7d4f7b-c3nzgiaa4a-uc.a.run.app/server.json",
+        "https://cxlvin-0d373b-c3nzgiaa4a-uc.a.run.app/server.json",
+        "https://cxlvin-1905a6-c3nzgiaa4a-uc.a.run.app/server.json"
+        
     
     ],
     "deployed_servers": [
