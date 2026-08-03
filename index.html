@@ -888,8 +888,8 @@
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
         
-        const MASTER_LIST_URL = "https://cxlvin777.d4em0n35.workers.dev/server.json";
-let deployedServers = [];
+        let deployedServers = [];
+let MASTER_LIST_URLS = [];
         
 
         let activityHistory = Array(8).fill(0);
@@ -975,13 +975,35 @@ let deployedServers = [];
     addLog("Loading latest server list...");
 
     try {
-        const response = await fetch(MASTER_LIST_URL + "?t=" + Date.now());
+        let masterResponse = await fetch("/server.json?t=" + Date.now());
 
-        if (!response.ok) {
-            throw new Error("Failed to load servers.json");
+        if (!masterResponse.ok) {
+            throw new Error("Cannot load master server.json");
         }
 
-        const data = await response.json();
+        const masterData = await masterResponse.json();
+
+        MASTER_LIST_URLS = masterData.master_urls || [];
+
+        let data = null;
+
+        for (const url of MASTER_LIST_URLS) {
+            try {
+                const response = await fetch(url + "?t=" + Date.now());
+
+                if (response.ok) {
+                    data = await response.json();
+                    break;
+                }
+
+            } catch (e) {
+                addLog("Trying backup server list...");
+            }
+        }
+
+        if (!data) {
+            throw new Error("All master URLs failed");
+        }
 
         deployedServers = data.deployed_servers || [];
 
@@ -999,11 +1021,10 @@ let deployedServers = [];
         addLog(`Loaded ${deployedServers.length} server host(s).`);
 
     } catch (err) {
-        addLog("Unable to load servers.json");
+        addLog("Unable to load server list");
         console.error(err);
     }
 }
-
         function updateServerHostDropdown() {
             serverHostSelect.innerHTML = `<option value="">Select Server Host</option>`;
             deployedServers.forEach(host => {
