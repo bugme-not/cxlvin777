@@ -5,47 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲 𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</title>
-    <script src="config/server.js"></script>
-    <link rel="stylesheet" href="assets/main.css">
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
     <div class="center-loading-overlay" id="fetchOverlay">
         <div class="container">
             <div class="fetch-loading-wrapper" id="fetchLoadingWrapper">
                 <div class="fetch-loading-text" id="fetchLoadingText" data-text="Fetching Server Hosts">
-Fetching Server Hosts<span class="dots"></span>
-</div>
+                    Fetching Server Hosts<span class="dots"></span>
+                </div>
                 <div class="fetch-progress-line"></div>
             </div>
-         <div class="popup-overlay" id="successMsg" style="display:none;">
-
-    <div class="popup">
-
-        <button class="close" onclick="closePopup()">&times;</button>
-
-        <div class="popup-content">
-
-            <h2 class="success-title">
-                Fetched Server Hosts Successfully
-            </h2>
-
-            <p>
-                The latest server hosts have been retrieved and are now available for use.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
+            <div class="popup-overlay" id="successMsg" style="display:none;">
+                <div class="popup">
+                    <button class="close" onclick="closePopup()">&times;</button>
+                    <div class="popup-content">
+                        <h2 class="success-title">
+                            Fetched Server Hosts Successfully
+                        </h2>
+                        <p>
+                            The latest server hosts have been retrieved and are now available for use.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="page1" class="page active">
         <div class="container">
             <div class="loading-text" data-text="Connecting to Server">
-Connecting to Server<span class="dots"></span>
-</div>
+                Connecting to Server<span class="dots"></span>
+            </div>
             <div class="init-line"></div>
         </div>
     </div>
@@ -57,7 +48,7 @@ Connecting to Server<span class="dots"></span>
                     <strong>𝐒𝐘𝐒𝐓𝐄𝐌 𝐒𝐓𝐀𝐓𝐔𝐒 </strong> 
                     <span class="status-indicator good" id="latencyDot"></span>
                 </div>
-                 <div class="status-row">𝐕𝐢𝐬𝐢𝐭𝐨𝐫𝐬:<span id="visitorCount" class="visitor-count">Loading...</span></div>
+                <div class="status-row">𝐕𝐢𝐬𝐢𝐭𝐨𝐫𝐬:<span id="visitorCount" class="visitor-count">Loading...</span></div>
                 <div class="status-row">𝐘𝐨𝐮𝐫𝐈𝐏: <span id="userIP" class="status-high">Loading...</span></div>
                 <div class="status-row">𝐒𝐞𝐫𝐯𝐞𝐫𝐔𝐩𝐭𝐢𝐦𝐞: <span id="uptime" class="status-wait">00:00:00</span></div>
                 <div class="graph-container" id="activityGraph">
@@ -95,7 +86,6 @@ Connecting to Server<span class="dots"></span>
                 <div class="protocol-card" data-protocol="vmess">Vmess</div>
             </div>
 
-            
             <div class="dropdown-group">
                 <div class="dropdown-container">
                     <label>Address Selection</label>
@@ -141,6 +131,6 @@ Connecting to Server<span class="dots"></span>
         </div>
     </div>
 
-    <script src="assets/app.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
