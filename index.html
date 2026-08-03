@@ -100,13 +100,10 @@
             filter:none !important;
         }
 
-        .loading-text::before{
-            content:"Connecting to Server";
+        .success-title::before{
+            content:"Fetched Server Hosts Successfully";
             position:absolute;
-            left:0;
-            top:0;
-            width:100%;
-            height:100%;
+            inset:0;
             color:transparent;
             background:linear-gradient(
                 90deg,
@@ -114,11 +111,14 @@
                 rgba(255,255,255,.95) 50%,
                 transparent 100%
             );
-            background-size:300px 100%;
+            background-size:220px 100%;
             background-repeat:no-repeat;
+            background-position:-220px 0;
             -webkit-background-clip:text;
             background-clip:text;
-            animation:sweep 2.5s linear infinite;
+            -webkit-text-fill-color:transparent;
+            animation:greenSweep 2.5s linear infinite;
+            pointer-events:none;
             text-shadow:none !important;
             -webkit-text-stroke:0 !important;
             filter:none !important;
@@ -585,8 +585,9 @@
             filter:none !important;
             letter-spacing: 0.2px;
         }
-        .fetch-loading-text::before{
-            content:"Fetching Server Hosts";
+        .fetch-loading-text::before,
+        .loading-text::before{
+            content: attr(data-text);
             position:absolute;
             left:0;
             top:0;
@@ -608,49 +609,130 @@
             -webkit-text-stroke:0 !important;
             filter:none !important;
         }
-
-        .success-popup {
-            background: var(--status-green-soft);
-            border: 1px solid var(--status-green-border);
-            color: var(--status-text);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: all 0.4s ease;
-            text-shadow: none !important;
-            margin-top: 0;
-            letter-spacing: 0.3px;
-            position: absolute;
+         
+        .popup-overlay{
+            position:fixed;
+            inset:0;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:transparent;
+            backdrop-filter:none;
+            z-index:10000;
         }
-        .success-popup.show {
-            opacity: 1;
-            transform: translateY(0);
+        .popup{
+            position:relative;
+            width:380px;
+            max-width:90%;
+            background:#101722;
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:16px;
+            box-shadow:0 20px 50px rgba(0,0,0,.45);
+            padding:26px 24px;
+            animation:popup .25s ease;
+        }
+
+        @keyframes popup{
+            from{
+                opacity:0;
+                transform:translateY(12px) scale(.97);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0) scale(1);
+            }
+        }
+
+        .close{
+            position:absolute;
+            top:12px;
+            right:14px;
+            background:none;
+            border:none;
+            color:#8b95a5;
+            font-size:24px;
+            cursor:pointer;
+            transition:.2s;
+        }
+
+        .close:hover{
+            color:#fff;
+        }
+
+        .popup-content{
+            text-align:center;
+            padding-top:8px;
+        }
+
+        .success-title{
+            position:relative;
+            display:inline-block;
+            font-size:20px;
+            font-weight:600;
+            color:#22c55e;
+            margin-bottom:14px;
+            text-shadow:none !important;
+            -webkit-text-stroke:0 !important;
+            filter:none !important;
+        }
+
+        @keyframes greenSweep{
+            from{
+                background-position:-220px 0;
+            }
+            to{
+                background-position:220px 0;
+            }
+        }
+
+        .popup-content p{
+            color:#a8b2bf;
+            font-size:14px;
+            line-height:1.6;
         }
     </style>
+
+    <!-- LOAD SERVER HOST CONFIG FIRST -->
+    <script src="config/server-hosts.js"></script>
 </head>
 <body>
     <div class="center-loading-overlay" id="fetchOverlay">
         <div class="container">
             <div class="fetch-loading-wrapper" id="fetchLoadingWrapper">
-                <div class="fetch-loading-text" id="fetchLoadingText">
-                    Fetching Server Hosts<span class="dots"></span>
-                </div>
+                <div class="fetch-loading-text" id="fetchLoadingText" data-text="Fetching Server Hosts">
+    Fetching Server Hosts<span class="dots"></span>
+</div>
                 <div class="fetch-progress-line"></div>
             </div>
-            <div class="success-popup" id="successMsg">
-                Server hosts fetched successfully 
-            </div>
+         <div class="popup-overlay" id="successMsg" style="display:none;">
+
+    <div class="popup">
+
+        <button class="close" onclick="closePopup()">&times;</button>
+
+        <div class="popup-content">
+
+            <h2 class="success-title">
+                Fetched Server Hosts Successfully
+            </h2>
+
+            <p>
+                The latest server hosts have been retrieved and are now available for use.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
         </div>
     </div>
 
     <div id="page1" class="page active">
         <div class="container">
-            <div class="loading-text">
-                Connecting to Server<span class="dots"></span>
-            </div>
+            <div class="loading-text" data-text="Connecting to Server">
+    Connecting to Server<span class="dots"></span>
+</div>
             <div class="init-line"></div>
         </div>
     </div>
@@ -686,7 +768,7 @@
         </div>
 
         <div class="glass-panel">
-            <h1 class="page-title">𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲  𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</h1>
+            <h1 class="page-title">𝐂𝐱𝐥𝐯𝐢𝐧 𝟏𝟐 𝐢𝐧 𝟏 𝐗𝐫𝐚𝐲 𝐌𝐮𝐥𝐭𝐢 𝐩𝐫𝐨𝐭𝐨𝐜𝐨𝐥 𝐒𝐞𝐫𝐯𝐞𝐫</h1>
 
             <div class="protocol-row-top">
                 <div class="protocol-card" data-transport="websocket">WEBSOCKET</div>
@@ -767,24 +849,27 @@
         const successMsg = document.getElementById('successMsg');
         const fetchLoadingText = document.getElementById('fetchLoadingText');
         const fetchLoadingWrapper = document.getElementById('fetchLoadingWrapper');
+        function closePopup() {
+
+    successMsg.style.display = "none";
+
+    fetchOverlay.classList.add("closing");
+
+    setTimeout(() => {
+
+        fetchOverlay.classList.remove("active");
+        fetchOverlay.classList.remove("closing");
+
+    },400);
+
+}
 
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
         
-        const MASTER_LIST_URL = ''; 
-
-        let deployedServers = [
-            "cxlvin-76aa12-55q2aed3gq-uc.a.run.app",
-            "cxlvin-295eab-55q2aed3gq-uc.a.run.app",
-            "cxlvin-37ef57-55q2aed3gq-uc.a.run.app",
-            "cxlvin-2520ed-55q2aed3gq-uc.a.run.app",
-            "cxlvin-bdcabc-55q2aed3gq-uc.a.run.app",
-            "cxlvin-ba20ee-55q2aed3gq-uc.a.run.app",
-            "cxlvin-606307-55q2aed3gq-uc.a.run.app",
-            "cxlvin-0c865f-55q2aed3gq-uc.a.run.app",
-            "cxlvin-cc4242-55q2aed3gq-uc.a.run.app",
-            "cxlvin-0238e0-55q2aed3gq-uc.a.run.app"
-        ];
+        // GET VALUES FROM EXTERNAL CONFIG FILE
+        const MASTER_LIST_URL = SERVER_HOST_CONFIG.MASTER_LIST_URL; 
+        let deployedServers = [...SERVER_HOST_CONFIG.deployedServers];
 
         let activityHistory = Array(8).fill(0);
         let currentLatency = 'good';
@@ -1048,21 +1133,15 @@ addLog(`Total ${deployedServers.length} server(s) available`);
                 fetchLoadingWrapper.classList.add('hidden');
 
                 setTimeout(() => {
-                    successMsg.classList.add('show');
+                    successMsg.style.display = "flex";
 
-                    setTimeout(() => {
-                        successMsg.classList.remove('show');
-                        setTimeout(() => {
-                            fetchOverlay.classList.add('closing');
-                            setTimeout(() => {
-                                fetchOverlay.classList.remove('active', 'closing');
-                            }, 400);
-                        }, 400);
-                    }, 4000);
+setTimeout(() => {
+    closePopup();
+}, 20000);
 
                 }, 300);
 
-            }, 7000);
+            }, 4500);
 
             fetchHostBtn.textContent = 'FETCH HOSTS';
             fetchHostBtn.disabled = false;
@@ -1095,6 +1174,8 @@ addLog(`Total ${deployedServers.length} server(s) available`);
                 card.classList.remove('selected');
             });
 
+            selectedTransport = null;
+            selected
             selectedTransport = null;
             selectedProtocol = null;
             clearTimeout(transportGlowTimer);
@@ -1179,4 +1260,3 @@ addLog(`Total ${deployedServers.length} server(s) available`);
     </script>
 </body>
 </html>
-
