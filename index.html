@@ -987,65 +987,19 @@ let MASTER_LIST_URLS = [];
 
         let data = null;
 
-        async function fetchAllServers() {
-    addLog("Loading latest server list...");
-
-    try {
-        let masterResponse = await fetch("/server.json?t=" + Date.now());
-
-        if (!masterResponse.ok) {
-            throw new Error("Cannot load master server.json");
-        }
-
-        const masterData = await masterResponse.json();
-
-        MASTER_LIST_URLS = masterData.master_urls || [];
-
-        deployedServers = [];
-
         for (const url of MASTER_LIST_URLS) {
             try {
                 const response = await fetch(url + "?t=" + Date.now());
 
                 if (response.ok) {
-                    const data = await response.json();
-
-                    if (data.deployed_servers) {
-                        deployedServers.push(...data.deployed_servers);
-                    }
-
-                    addLog(`Loaded master: ${url}`);
+                    data = await response.json();
+                    break;
                 }
 
             } catch (e) {
-                addLog(`Failed master: ${url}`);
+                addLog("Trying backup server list...");
             }
         }
-
-
-        // Remove duplicate servers
-        deployedServers = [...new Set(deployedServers)];
-
-
-        const currentHost = window.location.hostname;
-
-        if (
-            currentHost.includes(".run.app") &&
-            !deployedServers.includes(currentHost)
-        ) {
-            deployedServers.push(currentHost);
-        }
-
-
-        updateServerHostDropdown();
-
-        addLog(`Loaded ${deployedServers.length} server host(s).`);
-
-    } catch (err) {
-        addLog("Unable to load server list");
-        console.error(err);
-    }
-}
 
         if (!data) {
             throw new Error("All master URLs failed");
@@ -1347,3 +1301,4 @@ setTimeout(() => {
     </script>
 </body>
 </html>
+
