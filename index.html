@@ -987,19 +987,26 @@ let MASTER_LIST_URLS = [];
 
         let data = null;
 
-        for (const url of MASTER_LIST_URLS) {
-            try {
-                const response = await fetch(url + "?t=" + Date.now());
+        deployedServers = [];
 
-                if (response.ok) {
-                    data = await response.json();
-                    break;
-                }
+for (const url of MASTER_LIST_URLS) {
+    try {
+        const response = await fetch(url + "?t=" + Date.now());
 
-            } catch (e) {
-                addLog("Trying backup server list...");
-            }
+        if (!response.ok) continue;
+
+        const data = await response.json();
+
+        if (Array.isArray(data.deployed_servers)) {
+            deployedServers.push(...data.deployed_servers);
         }
+
+    } catch (e) {
+        console.log("Failed:", url);
+    }
+}
+
+deployedServers = [...new Set(deployedServers)];
 
         if (!data) {
             throw new Error("All master URLs failed");
