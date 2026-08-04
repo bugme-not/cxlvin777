@@ -1008,24 +1008,24 @@ for (const url of MASTER_LIST_URLS) {
 
 deployedServers = [...new Set(deployedServers)];
 
-        if (!data) {
-            throw new Error("All master URLs failed");
-        }
+        deployedServers = [...new Set(deployedServers)];
 
-        deployedServers = data.deployed_servers || [];
+if (deployedServers.length === 0) {
+    throw new Error("All master URLs failed");
+}
 
-        const currentHost = window.location.hostname;
+const currentHost = window.location.hostname;
 
-        if (
-            currentHost.includes(".run.app") &&
-            !deployedServers.includes(currentHost)
-        ) {
-            deployedServers.push(currentHost);
-        }
+if (
+    currentHost.includes(".run.app") &&
+    !deployedServers.includes(currentHost)
+) {
+    deployedServers.push(currentHost);
+}
 
-        updateServerHostDropdown();
+updateServerHostDropdown();
 
-        addLog(`Loaded ${deployedServers.length} server host(s).`);
+addLog(`Loaded ${deployedServers.length} server host(s).`);
 
     } catch (err) {
         addLog("Unable to load server list");
