@@ -1,6 +1,7 @@
 {
     "master_urls": [
-        
+        "http://bugme-not.github.io/cxlvin777/server.json",
+        "https://cxlvin777.d4em0n35.workers.dev/server.json"
         
     ],
     "deployed_servers": [
