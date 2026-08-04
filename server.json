@@ -1,13 +1,10 @@
 {
-    "master_urls": [
-        
-        "http://bugme-not.github.io/cxlvin777/server.json",
-        "https://cxlvin777.d4em0n35.workers.dev/server.json"
-        
-    ],
-    "deployed_servers": [
-        "cxlvin777.d4em0n35.workers.dev/",
-        "cxlvin777.d4em0n35.workers.dev",
-        "cxlvin777.d4em0n35.workers.dev"
-    ]
+  "deployed_servers": [
+    "cxlvin777.d4em0n35.workers.dev",
+    "bugme-not.github.io/cxlvin777/",
+    "cxlvin-q2d733-2tb4hqsf2a-uc.a.run.app",
+    "cxlvin-629d3d-2tb4hqsf2a-uc.a.run.app",
+    "cxlvin-397082-2tb4hqsf2a-uc.a.run.app",
+    "cxlvin-07cab7-2tb4hqsf2a-uc.a.run.app"
+  ]
 }
