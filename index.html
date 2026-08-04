@@ -888,9 +888,7 @@
         let serverStartTime = null;
         const BACKEND_ENDPOINT = '/api/status';
         
-        let deployedServers = [];
-let MASTER_LIST_URLS = [];
-        
+        const MASTER_LIST_URL = '/server.json';
 
         let activityHistory = Array(8).fill(0);
         let currentLatency = 'good';
@@ -972,66 +970,39 @@ let MASTER_LIST_URLS = [];
         };
         
         async function fetchAllServers() {
-    addLog("Loading latest server list...");
+    addLog('Loading latest server list...');
 
     try {
-        let masterResponse = await fetch("/server.json?t=" + Date.now());
+        const res = await fetch(MASTER_LIST_URL + '?t=' + Date.now());
 
-        if (!masterResponse.ok) {
-            throw new Error("Cannot load master server.json");
+        if (!res.ok) {
+            throw new Error('Failed');
         }
 
-        const masterData = await masterResponse.json();
+        const data = await res.json();
 
-        MASTER_LIST_URLS = masterData.master_urls || [];
+        deployedServers = data.deployed_servers || [];
 
-        let data = null;
+        const currentHost = location.hostname;
 
-        deployedServers = [];
-
-for (const url of MASTER_LIST_URLS) {
-    try {
-        const response = await fetch(url + "?t=" + Date.now());
-
-        if (!response.ok) continue;
-
-        const data = await response.json();
-
-        if (Array.isArray(data.deployed_servers)) {
-            deployedServers.push(...data.deployed_servers);
+        if (
+            currentHost.includes('.run.app') &&
+            !deployedServers.includes(currentHost)
+        ) {
+            deployedServers.push(currentHost);
         }
 
-    } catch (e) {
-        console.log("Failed:", url);
+        updateServerHostDropdown();
+
+        addLog('Server list updated successfully.');
+
+    } catch (error) {
+
+        addLog('Failed to load server list.');
+
     }
 }
 
-deployedServers = [...new Set(deployedServers)];
-
-        deployedServers = [...new Set(deployedServers)];
-
-if (deployedServers.length === 0) {
-    throw new Error("All master URLs failed");
-}
-
-const currentHost = window.location.hostname;
-
-if (
-    currentHost.includes(".run.app") &&
-    !deployedServers.includes(currentHost)
-) {
-    deployedServers.push(currentHost);
-}
-
-updateServerHostDropdown();
-
-addLog(`Loaded ${deployedServers.length} server host(s).`);
-
-    } catch (err) {
-        addLog("Unable to load server list");
-        console.error(err);
-    }
-}
         function updateServerHostDropdown() {
             serverHostSelect.innerHTML = `<option value="">Select Server Host</option>`;
             deployedServers.forEach(host => {
